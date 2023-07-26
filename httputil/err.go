@@ -20,7 +20,7 @@ type ValidationErr struct {
 type Err struct {
 	Code  int             `json:"code"`
 	Msg   string          `json:"msg"`
-	Items []ValidationErr `json:"items"`
+	Items []ValidationErr `json:"items,omitempty"`
 }
 
 // ErrResponse represents json container for error object
