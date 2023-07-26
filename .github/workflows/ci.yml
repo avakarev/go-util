@@ -1,0 +1,21 @@
+name: ci
+on: [push]
+
+jobs:
+  test:
+    name: using go ${{ matrix.go }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go: ['1.20', '1.19']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ matrix.go }}
+
+      - name: Lint & Test
+        run: make setup-ci ci
