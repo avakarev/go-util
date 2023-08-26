@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
@@ -76,7 +77,12 @@ func (db *DB) Create(model interface{}) error {
 	if err := validate.Struct(model); err != nil {
 		return err
 	}
-	return db.Conn().Create(model).Error
+	if err := db.Conn().Create(model).Error; err != nil {
+		return err
+	}
+
+	db.AfterCreateHook(model)
+	return nil
 }
 
 // Changeset extracts values of given field names from the model
@@ -115,7 +121,49 @@ func (db *DB) Update(model interface{}, names ...string) error {
 	if err != nil {
 		return err
 	}
-	return db.Conn().Model(model).Updates(data).Error
+
+	if err := db.Conn().Model(model).Updates(data).Error; err != nil {
+		return err
+	}
+
+	db.AfterUpdateHook(model)
+	return nil
+}
+
+// Delete deletes given record from the db table
+func (db *DB) Delete(model interface{}, conds ...interface{}) error {
+	if err := db.Conn().Delete(model, conds...).Error; err != nil {
+		return err
+	}
+
+	db.AfterDeleteHook(model)
+	return nil
+}
+
+// DeleteByID deletes given record with given id from the db table
+func (db *DB) DeleteByID(model interface{}, id string) error {
+	source := reflect.ValueOf(model)
+	if source.Kind() != reflect.Ptr {
+		return fmt.Errorf("model is expected to be <ptr>, instead <%T> is given", model)
+	}
+	source = source.Elem() // dereference the ptr
+	if source.Kind() != reflect.Struct {
+		return fmt.Errorf("model is expected to be <struct>, instead <%s> is given", source.Kind())
+	}
+
+	uid, err := uuid.Parse(id)
+	if err != nil {
+		return err
+	}
+
+	idField := source.FieldByName("ID")
+	if idField.IsValid() && idField.CanSet() {
+		idField.Set(reflect.ValueOf(uid))
+	} else {
+		return fmt.Errorf("can't set ID field for <%T> model", model)
+	}
+
+	return db.Delete(model)
 }
 
 func init() {
