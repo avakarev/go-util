@@ -3,12 +3,10 @@ package envutil
 import "fmt"
 
 const (
-	// Var is env variable name
-	Var = "APP_ENV"
-	// Dev is "dev" env
-	Dev = "dev"
-	// Prod is "prod" env
-	Prod = "prod"
+	// EnvDev is "dev" env
+	EnvDev = "dev"
+	// EnvProd is "prod" env
+	EnvProd = "prod"
 )
 
 // AppEnv implements application environment
@@ -21,21 +19,21 @@ func (env AppEnv) String() string {
 
 // IsDev checks whether given env is dev
 func (env AppEnv) IsDev() bool {
-	return env.String() == Dev
+	return env.String() == EnvDev
 }
 
 // IsProd checks whether given env is prod
 func (env AppEnv) IsProd() bool {
-	return env.String() == Prod
+	return env.String() == EnvProd
 }
 
 // NewAppEnv returns new AppEnv value
 func NewAppEnv() (AppEnv, error) {
-	s, err := MustStr(Var)
+	s, err := MustStr("APP_ENV")
 	if err != nil {
 		return AppEnv(""), err
 	}
-	if s != Dev && s != Prod {
+	if s != EnvDev && s != EnvProd {
 		return AppEnv(""), fmt.Errorf("unexpected app env %q", s)
 	}
 	return AppEnv(s), nil
