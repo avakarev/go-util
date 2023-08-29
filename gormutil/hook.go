@@ -18,24 +18,24 @@ const (
 // HookEvent represents event that triggered hook
 type HookEvent string
 
+// String returns event's string representation
+func (e HookEvent) String() string {
+	return string(e)
+}
+
 // IsAfterCreate checks whether event is "AfterCreate"
 func (e HookEvent) IsAfterCreate() bool {
-	return string(e) == HookAfterCreate
+	return e.String() == HookAfterCreate
 }
 
 // IsAfterUpdate checks whether event is "AfterUpdate"
 func (e HookEvent) IsAfterUpdate() bool {
-	return string(e) == HookAfterUpdate
+	return e.String() == HookAfterUpdate
 }
 
 // IsAfterDelete checks whether event is "AfterDelete"
 func (e HookEvent) IsAfterDelete() bool {
-	return string(e) == HookAfterDelete
-}
-
-// String returns event's string representation
-func (e HookEvent) String() string {
-	return string(e)
+	return e.String() == HookAfterDelete
 }
 
 // HookHandlerFunc is a subscription's callback

@@ -2,18 +2,25 @@
 package gormutil
 
 import (
+	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
 )
 
 // DB defines db container
 type DB struct {
-	conn  *gorm.DB
-	hooks *HookBus
+	conn     *gorm.DB
+	validate *validator.Validate
+	hooks    *HookBus
 }
 
 // Conn returns gorm's connection
 func (db *DB) Conn() *gorm.DB {
 	return db.conn
+}
+
+// RegisterValidation adds a custom validation for the given tag
+func (db *DB) RegisterValidation(tag string, fn validator.Func) error {
+	return db.validate.RegisterValidation(tag, fn)
 }
 
 // SubscribeHook creates subscription for create/update/delete changes of given model
@@ -61,5 +68,5 @@ func Open(dialector gorm.Dialector) (*DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &DB{conn: conn}, nil
+	return &DB{conn: conn, validate: validator.New()}, nil
 }
