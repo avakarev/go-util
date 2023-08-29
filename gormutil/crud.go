@@ -5,14 +5,11 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 )
-
-var validate *validator.Validate
 
 // First returns first row matching the given query
 func First[T any](tx *gorm.DB) *T {
@@ -74,7 +71,7 @@ func (db *DB) ExistsByID(model interface{}, id string) bool {
 
 // Create validates and persists new record
 func (db *DB) Create(model interface{}) error {
-	if err := validate.Struct(model); err != nil {
+	if err := db.validate.Struct(model); err != nil {
 		return err
 	}
 	if err := db.Conn().Create(model).Error; err != nil {
@@ -109,7 +106,7 @@ func Changeset(model interface{}, names []string) (map[string]interface{}, error
 
 // Update validates and persists existing record
 func (db *DB) Update(model interface{}, names ...string) error {
-	if err := validate.Struct(model); err != nil {
+	if err := db.validate.Struct(model); err != nil {
 		return err
 	}
 
@@ -164,8 +161,4 @@ func (db *DB) DeleteByID(model interface{}, id string) error {
 	}
 
 	return db.Delete(model)
-}
-
-func init() {
-	validate = validator.New()
 }
