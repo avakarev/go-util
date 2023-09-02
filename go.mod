@@ -3,7 +3,7 @@ module github.com/avakarev/go-util
 go 1.20
 
 require (
-	github.com/go-playground/validator/v10 v10.15.1
+	github.com/go-playground/validator/v10 v10.15.3
 	github.com/google/go-cmp v0.5.9
 	github.com/google/uuid v1.3.1
 	github.com/rs/zerolog v1.30.0
