@@ -2,15 +2,19 @@
 package gormutil
 
 import (
+	"sync"
+
 	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
 )
 
 // DB defines db container
 type DB struct {
-	conn     *gorm.DB
-	validate *validator.Validate
-	hooks    *HookBus
+	mu             sync.Mutex
+	lockingEnabled bool
+	conn           *gorm.DB
+	validate       *validator.Validate
+	hooks          *HookBus
 }
 
 // Conn returns gorm's connection
@@ -57,6 +61,12 @@ func (db *DB) WithHooks() *DB {
 		db.hooks = newHookBus()
 		go db.hooks.run()
 	}
+	return db
+}
+
+// WithLocking enables mutex locking during create/update/delete calls
+func (db *DB) WithLocking() *DB {
+	db.lockingEnabled = true
 	return db
 }
 
