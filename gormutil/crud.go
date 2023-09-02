@@ -71,6 +71,11 @@ func (db *DB) ExistsByID(model interface{}, id string) bool {
 
 // Create validates and persists new record
 func (db *DB) Create(model interface{}) error {
+	if db.lockingEnabled {
+		db.mu.Lock()
+		defer db.mu.Unlock()
+	}
+
 	if err := db.validate.Struct(model); err != nil {
 		return err
 	}
@@ -106,6 +111,11 @@ func Changeset(model interface{}, names []string) (map[string]interface{}, error
 
 // Update validates and persists existing record
 func (db *DB) Update(model interface{}, names ...string) error {
+	if db.lockingEnabled {
+		db.mu.Lock()
+		defer db.mu.Unlock()
+	}
+
 	if err := db.validate.Struct(model); err != nil {
 		return err
 	}
@@ -129,6 +139,11 @@ func (db *DB) Update(model interface{}, names ...string) error {
 
 // Delete deletes given record from the db table
 func (db *DB) Delete(model interface{}, conds ...interface{}) error {
+	if db.lockingEnabled {
+		db.mu.Lock()
+		defer db.mu.Unlock()
+	}
+
 	if err := db.Conn().Delete(model, conds...).Error; err != nil {
 		return err
 	}
