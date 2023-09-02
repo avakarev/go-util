@@ -52,4 +52,10 @@ func TestInt(t *testing.T) {
 	testutil.MustNoErr(err, t)
 	testutil.Diff(int64(42), num, t)
 	resetEnv()
+
+	resetEnv = testutil.SetEnv(testutil.Env{"FOOBAR": "-1"})
+	num, err = envutil.Int("FOOBAR")
+	testutil.MustNoErr(err, t)
+	testutil.Diff(int64(-1), num, t)
+	resetEnv()
 }
