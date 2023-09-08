@@ -2,6 +2,8 @@
 package numutil
 
 import (
+	"math"
+
 	"golang.org/x/exp/constraints"
 )
 
@@ -23,4 +25,10 @@ func PercentDiff[T Number](before T, after T) float64 {
 // ChangeByPercent calculates change of given number by given percent
 func ChangeByPercent[T Number](value T, percent float64) float64 {
 	return float64(value) + float64(value)*percent/100
+}
+
+// Round rounds given float number to given precision (decimal digits)
+func Round[T float32 | float64](value T, precision uint) float64 {
+	ratio := math.Pow(10, float64(precision))
+	return math.Round(float64(value)*ratio) / ratio
 }
