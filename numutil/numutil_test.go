@@ -26,3 +26,24 @@ func TestChangeByPercent(t *testing.T) {
 	testutil.Diff(26.25, numutil.ChangeByPercent(25, 5), t)
 	testutil.Diff(40.0, numutil.ChangeByPercent(50, -20), t)
 }
+
+func TestRound(t *testing.T) {
+	cases := []struct {
+		got       float64
+		precision uint
+		want      float64
+	}{
+		{got: 12.3456789, precision: 0, want: 12},
+		{got: 12.3456789, precision: 1, want: 12.3},
+		{got: 12.3456789, precision: 2, want: 12.35},
+		{got: 12.3456789, precision: 3, want: 12.346},
+		{got: 12.3456789, precision: 4, want: 12.3457},
+		{got: 12.3456789, precision: 5, want: 12.34568},
+		{got: 12.3456789, precision: 6, want: 12.345679},
+		{got: -12.3456789, precision: 4, want: -12.3457},
+	}
+	for i := range cases {
+		got := numutil.Round(cases[i].got, cases[i].precision)
+		testutil.Diff(cases[i].want, got, t)
+	}
+}
