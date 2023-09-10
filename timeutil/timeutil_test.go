@@ -38,7 +38,7 @@ func TestLocalWithEET(t *testing.T) {
 	testutil.Diff("2022-06-03T19:26:15+03:00", timeutil.Local(timeFixture()).Format(time.RFC3339), t)
 }
 
-func TestMockNow(t *testing.T) {
+func TestMockNowFn(t *testing.T) {
 	timeutil.MockNow(timeFixture)
 	defer timeutil.UnmockNow()
 
