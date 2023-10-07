@@ -27,6 +27,11 @@ func (db *DB) RegisterValidation(tag string, fn validator.Func) error {
 	return db.validate.RegisterValidation(tag, fn)
 }
 
+// RegisterValidationTagNameFunc registers a function to get alternate names for StructFields
+func (db *DB) RegisterValidationTagNameFunc(fn validator.TagNameFunc) {
+	db.validate.RegisterTagNameFunc(fn)
+}
+
 // SubscribeHook creates subscription for create/update/delete changes of given model
 func (db *DB) SubscribeHook(model interface{}, fn HookHandlerFunc) {
 	if db.hooks != nil {
