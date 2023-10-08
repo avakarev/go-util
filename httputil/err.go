@@ -44,16 +44,24 @@ func (e *ErrResponse) WriteJSON(w http.ResponseWriter) {
 // StdErrMsg returns standard error message by code
 func StdErrMsg(code int) string {
 	switch code {
-	case http.StatusBadRequest:
+	case http.StatusBadRequest: // 400
 		return "bad request"
-	case http.StatusUnauthorized:
+	case http.StatusUnauthorized: // 401
 		return "unauthorized"
-	case http.StatusForbidden:
+	case http.StatusForbidden: // 403
 		return "forbidden"
-	case http.StatusNotFound:
+	case http.StatusNotFound: // 404
 		return "not found"
-	case http.StatusInternalServerError:
+	case http.StatusInternalServerError: // 500
 		return "internal server error"
+	case http.StatusNotImplemented: // 501
+		return "not implemented"
+	case http.StatusBadGateway: // 502
+		return "bad gateway"
+	case http.StatusServiceUnavailable: // 503
+		return "service unavailable"
+	case http.StatusGatewayTimeout: // 504
+		return "gateway timeout"
 	default:
 		return "unknown error"
 	}
