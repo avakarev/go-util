@@ -69,6 +69,11 @@ func (db *DB) ExistsByID(model interface{}, id string) bool {
 	return db.ExistsBy(model, "id = ?", id)
 }
 
+// Validate validates given model struct
+func (db *DB) Validate(model interface{}) error {
+	return db.validate.Struct(model)
+}
+
 // Create validates and persists new record
 func (db *DB) Create(model interface{}) error {
 	if db.lockingEnabled {
@@ -76,7 +81,7 @@ func (db *DB) Create(model interface{}) error {
 		defer db.mu.Unlock()
 	}
 
-	if err := db.validate.Struct(model); err != nil {
+	if err := db.Validate(model); err != nil {
 		return err
 	}
 	if err := db.Conn().Create(model).Error; err != nil {
@@ -116,7 +121,7 @@ func (db *DB) Update(model interface{}, names ...string) error {
 		defer db.mu.Unlock()
 	}
 
-	if err := db.validate.Struct(model); err != nil {
+	if err := db.Validate(model); err != nil {
 		return err
 	}
 
