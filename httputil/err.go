@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"os"
 
 	"github.com/avakarev/go-util/strutil"
 	"github.com/go-playground/validator/v10"
@@ -35,6 +36,7 @@ func (e *ErrResponse) WriteJSON(w http.ResponseWriter) {
 	bytes, err := json.Marshal(e)
 	if err != nil {
 		log.Error().Err(err).Send()
+		return
 	}
 	if _, err := w.Write([]byte(bytes)); err != nil {
 		log.Error().Err(err).Send()
@@ -110,5 +112,10 @@ func NewErrFrom(err error) *ErrResponse {
 	if errors.As(err, &ve) {
 		return NewValidationErr(ve)
 	}
+
+	if errors.Is(err, os.ErrNotExist) {
+		return NewErr(http.StatusNotFound, "")
+	}
+
 	return NewErr(http.StatusInternalServerError, err.Error())
 }
