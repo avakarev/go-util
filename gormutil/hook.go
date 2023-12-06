@@ -40,9 +40,9 @@ func (e HookEvent) IsAfterDelete() bool {
 
 // Hook defines hook event
 type Hook struct {
-	table string
-	model interface{}
-	event HookEvent
+	Table string
+	Model interface{}
+	Event HookEvent
 }
 
 // HookHandlerFunc is a subscription's callback
@@ -68,9 +68,9 @@ type HookBus struct {
 
 func (hb *HookBus) publish(model interface{}, event HookEvent) {
 	hb.publishChan <- &Hook{
-		table: tableName(model),
-		model: model,
-		event: event,
+		Table: tableName(model),
+		Model: model,
+		Event: event,
 	}
 }
 
@@ -96,7 +96,7 @@ func (hb *HookBus) run() {
 			hb.subscriptions[sub] = struct{}{}
 		case hook := <-hb.publishChan:
 			for sub := range hb.subscriptions {
-				if sub.table == hook.table {
+				if sub.table == hook.Table {
 					go sub.handler(hook)
 				}
 			}
