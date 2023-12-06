@@ -38,20 +38,20 @@ func (e HookEvent) IsAfterDelete() bool {
 	return e.String() == HookAfterDelete
 }
 
-// HookHandlerFunc is a subscription's callback
-type HookHandlerFunc func(model interface{}, event HookEvent)
-
-// HookSubscription defines hook's subscription
-type HookSubscription struct {
-	handler HookHandlerFunc
-	table   string
-}
-
 // Hook defines hook event
 type Hook struct {
 	table string
 	model interface{}
 	event HookEvent
+}
+
+// HookHandlerFunc is a subscription's callback
+type HookHandlerFunc func(hook *Hook)
+
+// HookSubscription defines hook's subscription
+type HookSubscription struct {
+	handler HookHandlerFunc
+	table   string
 }
 
 // HookBus maintains the set of subscriptions and broadcast any incoming hooks
@@ -97,7 +97,7 @@ func (hb *HookBus) run() {
 		case hook := <-hb.publishChan:
 			for sub := range hb.subscriptions {
 				if sub.table == hook.table {
-					go sub.handler(hook.model, hook.event)
+					go sub.handler(hook)
 				}
 			}
 		}
