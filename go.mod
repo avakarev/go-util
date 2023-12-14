@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/go-playground/validator/v10 v10.16.0
 	github.com/google/go-cmp v0.6.0
-	github.com/google/uuid v1.4.0
+	github.com/google/uuid v1.5.0
 	github.com/nats-io/nats.go v1.31.0
 	github.com/rs/zerolog v1.31.0
 	golang.org/x/exp v0.0.0-20231206192017-f3f8817b8deb
