@@ -61,15 +61,15 @@ func (c *Client) SubscribeJSON(subj string, fn nats.Handler) error {
 }
 
 // Request sends request and returns reply's message
-func (c *Client) Request(subj string, v any) (*nats.Msg, error) {
+func (c *Client) Request(subj string, v any, timeout time.Duration) (*nats.Msg, error) {
 	if v != nil {
 		dataBytes, err := json.Marshal(v)
 		if err != nil {
 			return nil, err
 		}
-		return c.conn.Request(c.envSubj(subj), dataBytes, 2*time.Second)
+		return c.conn.Request(c.envSubj(subj), dataBytes, timeout)
 	}
-	return c.conn.Request(c.envSubj(subj), nil, 2*time.Second)
+	return c.conn.Request(c.envSubj(subj), nil, timeout)
 }
 
 // Close unsubscribes consumers and closes connections
