@@ -8,7 +8,7 @@ require (
 	github.com/google/uuid v1.5.0
 	github.com/nats-io/nats.go v1.31.0
 	github.com/rs/zerolog v1.31.0
-	golang.org/x/exp v0.0.0-20231206192017-f3f8817b8deb
+	golang.org/x/exp v0.0.0-20231219180239-dc181d75b848
 	gorm.io/gorm v1.25.5
 )
 
