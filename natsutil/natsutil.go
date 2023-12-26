@@ -9,6 +9,13 @@ import (
 	"github.com/avakarev/go-util/httputil"
 )
 
+// Respond responds given bytes
+func Respond(msg *nats.Msg, bytes []byte) {
+	if err := msg.Respond(bytes); err != nil {
+		log.Error().Err(err).Send()
+	}
+}
+
 // RespondJSON responds given value as marshalled bytes
 func RespondJSON(msg *nats.Msg, v any) {
 	bytes, err := json.Marshal(v)
@@ -16,9 +23,7 @@ func RespondJSON(msg *nats.Msg, v any) {
 		log.Error().Err(err).Send()
 		return
 	}
-	if err := msg.Respond(bytes); err != nil {
-		log.Error().Err(err).Send()
-	}
+	Respond(msg, bytes)
 }
 
 // RespondJSONErr responds given error value as marshalled bytes
