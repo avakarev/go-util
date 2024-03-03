@@ -5,6 +5,8 @@ import "fmt"
 const (
 	// EnvDev is "dev" env
 	EnvDev = "dev"
+	// EnvBeta is "beta" env
+	EnvBeta = "beta"
 	// EnvProd is "prod" env
 	EnvProd = "prod"
 )
@@ -22,6 +24,11 @@ func (env AppEnv) IsDev() bool {
 	return env.String() == EnvDev
 }
 
+// IsBeta checks whether given env is beta
+func (env AppEnv) IsBeta() bool {
+	return env.String() == EnvBeta
+}
+
 // IsProd checks whether given env is prod
 func (env AppEnv) IsProd() bool {
 	return env.String() == EnvProd
@@ -33,7 +40,7 @@ func NewAppEnv() (AppEnv, error) {
 	if err != nil {
 		return AppEnv(""), err
 	}
-	if s != EnvDev && s != EnvProd {
+	if s != EnvDev && s != EnvBeta && s != EnvProd {
 		return AppEnv(""), fmt.Errorf("unexpected app env %q", s)
 	}
 	return AppEnv(s), nil
