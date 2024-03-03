@@ -49,6 +49,17 @@ func (c *Client) Subscribe(subj string, fn nats.MsgHandler) error {
 	return nil
 }
 
+// QueueSubscribe subscribes given hander to the given subject
+func (c *Client) QueueSubscribe(subj string, queue string, fn nats.MsgHandler) error {
+	sub, err := c.conn.QueueSubscribe(c.envSubj(subj), queue, fn)
+	if err != nil {
+		return err
+	}
+	log.Debug().Str("subject", sub.Subject).Str("queue", queue).Msg("nats: subscribed")
+	c.subscriptions[sub] = struct{}{}
+	return nil
+}
+
 // SubscribeJSON subscribes given hander to the given subject
 func (c *Client) SubscribeJSON(subj string, fn nats.Handler) error {
 	sub, err := c.connJSON.Subscribe(c.envSubj(subj), fn)
