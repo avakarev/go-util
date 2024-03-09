@@ -22,7 +22,9 @@ type Client struct {
 }
 
 func (c *Client) envSubj(subj string) string {
-	if strings.HasPrefix(subj, envutil.EnvDev) || strings.HasPrefix(subj, envutil.EnvProd) {
+	if strings.HasPrefix(subj, envutil.EnvDev) ||
+		strings.HasPrefix(subj, envutil.EnvBeta) ||
+		strings.HasPrefix(subj, envutil.EnvProd) {
 		return subj
 	}
 	return fmt.Sprintf("%s.%s", c.env.String(), subj)
