@@ -6,10 +6,10 @@ require (
 	github.com/go-playground/validator/v10 v10.19.0
 	github.com/google/go-cmp v0.6.0
 	github.com/google/uuid v1.6.0
-	github.com/nats-io/nats.go v1.33.1
+	github.com/nats-io/nats.go v1.34.0
 	github.com/rs/zerolog v1.32.0
-	golang.org/x/exp v0.0.0-20240222234643-814bf88cf225
-	gorm.io/gorm v1.25.7
+	golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8
+	gorm.io/gorm v1.25.9
 )
 
 require (
