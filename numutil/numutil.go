@@ -32,3 +32,8 @@ func Round[T float32 | float64](value T, precision uint) float64 {
 	ratio := math.Pow(10, float64(precision))
 	return math.Round(float64(value)*ratio) / ratio
 }
+
+// Drawdown calculates percentage of the peak value
+func Drawdown[T Number](high T, regular T) float64 {
+	return PercentOf(high-regular, high)
+}

@@ -47,3 +47,11 @@ func TestRound(t *testing.T) {
 		testutil.Diff(cases[i].want, got, t)
 	}
 }
+
+func TestDrawdown(t *testing.T) {
+	testutil.Diff(56.7435, numutil.Round(numutil.Drawdown(40.78, 17.64), 4), t)
+	testutil.Diff(54.9534, numutil.Round(numutil.Drawdown(40.78, 18.37), 4), t)
+	testutil.Diff(50.0, numutil.Drawdown(90, 45), t)
+	testutil.Diff(1.0, numutil.Drawdown(100, 99), t)
+	testutil.Diff(-25.0, numutil.Drawdown(20, 25), t)
+}
