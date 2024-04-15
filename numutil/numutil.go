@@ -12,6 +12,11 @@ type Number interface {
 	constraints.Integer | constraints.Float
 }
 
+// Percent calculates value of given <percent> from given <total>
+func Percent[T Number](percent T, total T) float64 {
+	return float64(percent) * float64(total) / 100
+}
+
 // PercentOf calculates what percent <part> of <total>
 func PercentOf[T Number](part T, total T) float64 {
 	return 100 * float64(part) / float64(total)

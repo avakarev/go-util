@@ -7,6 +7,14 @@ import (
 	"github.com/avakarev/go-util/testutil"
 )
 
+func TestPercent(t *testing.T) {
+	testutil.Diff(1.0, numutil.Percent(2, 50), t)
+	testutil.Diff(1.25, numutil.Percent(2.5, 50.0), t)
+	testutil.Diff(33.33, numutil.Percent(66.66, 50.0), t)
+	testutil.Diff(49.0, numutil.Percent(98.0, 50.0), t)
+	testutil.Diff(55.55, numutil.Percent(111.1, 50.0), t)
+}
+
 func TestPercentOf(t *testing.T) {
 	testutil.Diff(2.0, numutil.PercentOf(1, 50), t)
 	testutil.Diff(2.5, numutil.PercentOf(1.25, 50.0), t)
