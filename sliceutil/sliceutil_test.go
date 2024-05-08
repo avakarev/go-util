@@ -1,6 +1,8 @@
 package sliceutil_test
 
 import (
+	"reflect"
+	"slices"
 	"testing"
 
 	"github.com/avakarev/go-util/sliceutil"
@@ -25,4 +27,13 @@ func TestContainsWithInt64(t *testing.T) {
 func TestContainsWithFloat64(t *testing.T) {
 	testutil.Diff(false, sliceutil.Contains([]float64{9.9, 42.42}, 0.1), t)
 	testutil.Diff(true, sliceutil.Contains([]float64{9.9, 42.42}, 42.42), t)
+}
+
+func TestShuffle(t *testing.T) {
+	slice := []string{"a", "b", "c", "d", "e", "f"}
+	shuffled := sliceutil.Shuffle(slice)
+	testutil.Diff(false, reflect.DeepEqual(slice, shuffled), t)
+	slices.Sort(slice)
+	slices.Sort(shuffled)
+	testutil.Diff(true, reflect.DeepEqual(slice, shuffled), t)
 }
