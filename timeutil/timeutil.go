@@ -34,11 +34,26 @@ func UnmockNow() {
 	nowFn = time.Now
 }
 
+// IsSameDay checks whether given time values are in same day
+func IsSameDay(t1 time.Time, t2 time.Time) bool {
+	year1, month1, day1 := t1.Date()
+	year2, month2, day2 := t2.Date()
+	return year1 == year2 && month1 == month2 && day1 == day2
+}
+
 // IsToday checks whether given time represents today's date
 func IsToday(t time.Time) bool {
-	todayYear, todayMonth, todayDay := Now().Date()
-	year, month, day := t.Date()
-	return todayYear == year && todayMonth == month && todayDay == day
+	return IsSameDay(Now(), t)
+}
+
+// IsYesterday checks whether given time represents yesterday's date
+func IsYesterday(t time.Time) bool {
+	return IsSameDay(Now().AddDate(0, 0, -1), t)
+}
+
+// IsTomorrow checks whether given time represents tomorrow's date
+func IsTomorrow(t time.Time) bool {
+	return IsSameDay(Now().AddDate(0, 0, 1), t)
 }
 
 // IsDay checks whether it is day
