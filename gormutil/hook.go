@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	// HookAfterCreate is event name for AfterCretate hook
+	// HookAfterCreate is event name for AfterCreate hook
 	HookAfterCreate = "AfterCreate"
 	// HookAfterUpdate is event name for AfterUpdate hook
 	HookAfterUpdate = "AfterUpdate"

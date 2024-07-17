@@ -24,7 +24,7 @@ func Now() time.Time {
 	return nowFn()
 }
 
-// MockNow repaces the Now() function with given implementation
+// MockNow replaces the Now() function with given implementation
 func MockNow(f func() time.Time) {
 	nowFn = f
 }
