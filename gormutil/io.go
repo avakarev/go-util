@@ -30,7 +30,7 @@ func FilterTables(tables []string, f *TableFilter) []string {
 	return filteredTables
 }
 
-// Tables retuns list of existing db tables respecing the given filter
+// Tables returns list of existing db tables respecing the given filter
 func (db *DB) Tables(filter *TableFilter) ([]string, error) {
 	tables, err := db.Conn().Migrator().GetTables()
 	if err != nil {

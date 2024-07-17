@@ -25,7 +25,7 @@ func MustStr(name string) (string, error) {
 	return value, nil
 }
 
-// StrSlice returns environment variable splitted by given separator
+// StrSlice returns environment variable split by given separator
 func StrSlice(name string, sep string) []string {
 	s := Str(name)
 	if s == "" {
@@ -34,7 +34,7 @@ func StrSlice(name string, sep string) []string {
 	return strings.Split(s, sep)
 }
 
-// MustStrSlice returns environment variable splitted by given separator and errors if it's not set
+// MustStrSlice returns environment variable split by given separator and errors if it's not set
 func MustStrSlice(name string, sep string) ([]string, error) {
 	s, err := MustStr(name)
 	if err != nil {

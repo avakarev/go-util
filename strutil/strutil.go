@@ -37,7 +37,7 @@ func Decapitalize(s string) string {
 	return strings.ToLower(string(s[0])) + s[1:]
 }
 
-// IsUUID checks wheter given string is in uuid format
+// IsUUID checks whether given string is in uuid format
 func IsUUID(s string) bool {
 	if len(s) == 36 && s[8] == '-' && s[13] == '-' && s[18] == '-' && s[23] == '-' {
 		return true

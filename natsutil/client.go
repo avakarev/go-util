@@ -40,7 +40,7 @@ func (c *Client) PublishJSON(subj string, data interface{}) error {
 	return c.connJSON.Publish(c.envSubj(subj), data)
 }
 
-// Subscribe subscribes given hander to the given subject
+// Subscribe subscribes given handler to the given subject
 func (c *Client) Subscribe(subj string, fn nats.MsgHandler) error {
 	sub, err := c.conn.Subscribe(c.envSubj(subj), fn)
 	if err != nil {
@@ -51,7 +51,7 @@ func (c *Client) Subscribe(subj string, fn nats.MsgHandler) error {
 	return nil
 }
 
-// QueueSubscribe subscribes given hander to the given subject
+// QueueSubscribe subscribes given handler to the given subject
 func (c *Client) QueueSubscribe(subj string, queue string, fn nats.MsgHandler) error {
 	sub, err := c.conn.QueueSubscribe(c.envSubj(subj), queue, fn)
 	if err != nil {
@@ -62,7 +62,7 @@ func (c *Client) QueueSubscribe(subj string, queue string, fn nats.MsgHandler) e
 	return nil
 }
 
-// SubscribeJSON subscribes given hander to the given subject
+// SubscribeJSON subscribes given handler to the given subject
 func (c *Client) SubscribeJSON(subj string, fn nats.Handler) error {
 	sub, err := c.connJSON.Subscribe(c.envSubj(subj), fn)
 	if err != nil {

@@ -8,7 +8,7 @@ import (
 )
 
 // Wait waits for first of given signals
-// Defautls to {syscall.SIGINT, syscall.SIGTERM} if no signals given
+// Defaults to {syscall.SIGINT, syscall.SIGTERM} if no signals given
 func Wait(sigs ...os.Signal) os.Signal {
 	if len(sigs) == 0 { // default
 		sigs = append(sigs, syscall.SIGINT, syscall.SIGTERM)
