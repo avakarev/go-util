@@ -34,6 +34,13 @@ func UnmockNow() {
 	nowFn = time.Now
 }
 
+// IsToday checks whether given time represents today's date
+func IsToday(t time.Time) bool {
+	todayYear, todayMonth, todayDay := Now().Date()
+	year, month, day := t.Date()
+	return todayYear == year && todayMonth == month && todayDay == day
+}
+
 // IsDay checks whether it is day
 func IsDay() bool {
 	if h := time.Now().Hour(); h >= 6 && h < 23 {
