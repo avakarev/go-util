@@ -5,13 +5,13 @@ go 1.23
 toolchain go1.23.1
 
 require (
-	github.com/go-playground/validator/v10 v10.22.0
+	github.com/go-playground/validator/v10 v10.22.1
 	github.com/google/go-cmp v0.6.0
 	github.com/google/uuid v1.6.0
-	github.com/nats-io/nats.go v1.36.0
+	github.com/nats-io/nats.go v1.37.0
 	github.com/rs/zerolog v1.33.0
-	golang.org/x/exp v0.0.0-20240716175740-e3f259677ff7
-	gorm.io/gorm v1.25.11
+	golang.org/x/exp v0.0.0-20240909161429-701f63a606c0
+	gorm.io/gorm v1.25.12
 )
 
 require (
