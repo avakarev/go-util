@@ -1,8 +1,6 @@
 module github.com/avakarev/go-util
 
-go 1.23
-
-toolchain go1.23.1
+go 1.21
 
 require (
 	github.com/go-playground/validator/v10 v10.22.1
