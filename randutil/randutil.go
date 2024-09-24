@@ -27,10 +27,10 @@ func String(n int) (string, error) {
 	return string(ret), nil
 }
 
-// Int returns random number in range [0, max]
+// Int returns random number in range [0, nmax]
 // It will panic if input is invalid, <= 0
-func Int(max int) int {
+func Int(nmax int) int {
 	rnd.Lock()
 	defer rnd.Unlock()
-	return rnd.r.Intn(max)
+	return rnd.r.Intn(nmax)
 }
