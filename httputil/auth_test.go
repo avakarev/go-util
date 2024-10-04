@@ -7,45 +7,34 @@ import (
 	"github.com/avakarev/go-util/testutil"
 )
 
-type context struct {
-	headers map[string]string
-}
-
-func (c context) GetHeader(s string) string {
-	return c.headers[s]
-}
-
 func TestAuthBearer(t *testing.T) {
 	cases := []struct {
-		ctx  context
-		want string
+		auth   string
+		bearer string
 	}{
 		{
-			ctx:  context{headers: map[string]string{"Foo": "Bar"}},
-			want: "",
+			auth:   "",
+			bearer: "",
 		}, {
-			ctx:  context{headers: map[string]string{"Authorization": ""}},
-			want: "",
+			auth:   "qux",
+			bearer: "",
 		}, {
-			ctx:  context{headers: map[string]string{"Authorization": "qux"}},
-			want: "",
+			auth:   "Bearer",
+			bearer: "",
 		}, {
-			ctx:  context{headers: map[string]string{"Authorization": "Bearer"}},
-			want: "",
+			auth:   "Bearer:",
+			bearer: "",
 		}, {
-			ctx:  context{headers: map[string]string{"Authorization": "Bearer:"}},
-			want: "",
+			auth:   "Bearer: qux",
+			bearer: "qux",
 		}, {
-			ctx:  context{headers: map[string]string{"Authorization": "Bearer: qux"}},
-			want: "qux",
-		}, {
-			ctx:  context{headers: map[string]string{"Authorization": "bearer: qux"}},
-			want: "qux",
+			auth:   "bearer: qux",
+			bearer: "qux",
 		}}
 
 	for i := range cases {
-		got := httputil.AuthBearer(cases[i].ctx)
-		want := cases[i].want
+		got := httputil.AuthBearer(cases[i].auth)
+		want := cases[i].bearer
 		testutil.Diff(want, got, t)
 	}
 }
