@@ -20,6 +20,9 @@ type BaseClient struct {
 }
 
 func (c *BaseClient) url(path string) string {
+	if path == "" {
+		return c.BaseURL
+	}
 	if strings.HasPrefix(path, "?") {
 		return c.BaseURL + path
 	}
