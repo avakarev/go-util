@@ -20,13 +20,18 @@ type testClient struct {
 	base httputil.BaseClient
 }
 
-func (tc *testClient) getItem(id string) (*item, error) {
+func (tc *testClient) getItemByID(id string) (*item, error) {
 	var i item
 	_, err := tc.base.GetJSON("/api/items/"+id, &i)
 	if err != nil {
 		return nil, err
 	}
 	return &i, nil
+}
+
+func (tc *testClient) submit() error {
+	_, err := tc.base.PostJSON("", map[string]any{}, nil)
+	return err
 }
 
 func newTestClient() *testClient {
@@ -48,8 +53,18 @@ func TestBaseClientGet(t *testing.T) {
 	httpmock.RegisterResponder("GET", "https://example.org/api/items/1",
 		httpmock.NewStringResponder(200, `{"id": "1", "name": "foobar"}`))
 
-	i, err := newTestClient().getItem("1")
+	i, err := newTestClient().getItemByID("1")
 	testutil.MustNoErr(err, t)
 	testutil.Diff(&item{ID: "1", Name: "foobar"}, i, t)
+}
 
+func TestBaseClientPostWith(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	httpmock.RegisterResponder("POST", "https://example.org",
+		httpmock.NewStringResponder(201, `{}`))
+
+	err := newTestClient().submit()
+	testutil.MustNoErr(err, t)
 }
