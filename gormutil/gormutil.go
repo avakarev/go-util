@@ -3,9 +3,11 @@ package gormutil
 
 import (
 	"sync"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 // DB defines db container
@@ -13,6 +15,7 @@ type DB struct {
 	mu             sync.Mutex
 	lockingEnabled bool
 	conn           *gorm.DB
+	config         *gorm.Config
 	validate       *validator.Validate
 	hooks          *HookBus
 }
@@ -75,13 +78,42 @@ func (db *DB) WithLocking() *DB {
 	return db
 }
 
-// Open initialize db session based on dialector
+// WithLogger sets given logger as gorm logger
+func (db *DB) WithLogger(l logger.Interface) *DB {
+	db.config.Logger = l
+	return db
+}
+
+// WithNowFunc sets given func as gorm now func
+func (db *DB) WithNowFunc(fn func() time.Time) *DB {
+	db.config.NowFunc = fn
+	return db
+}
+
+// Open initializes db session based on dialector
+func (db *DB) Open(dialector gorm.Dialector) error {
+	conn, err := gorm.Open(dialector, db.config)
+	if err != nil {
+		return err
+	}
+	db.conn = conn
+	return nil
+}
+
+// New returns new DB value
+func New() *DB {
+	return &DB{validate: validator.New()}
+}
+
+// Open initializes db session based on dialector
+// Deprecated: use gormutil.New().Open() instead
 func Open(dialector gorm.Dialector) (*DB, error) {
-	conn, err := gorm.Open(dialector, &gorm.Config{
+	config := &gorm.Config{
 		Logger: Logger,
-	})
+	}
+	conn, err := gorm.Open(dialector, config)
 	if err != nil {
 		return nil, err
 	}
-	return &DB{conn: conn, validate: validator.New()}, nil
+	return &DB{conn: conn, config: config, validate: validator.New()}, nil
 }
