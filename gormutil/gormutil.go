@@ -102,7 +102,7 @@ func (db *DB) Open(dialector gorm.Dialector) error {
 
 // New returns new DB value
 func New() *DB {
-	return &DB{validate: validator.New()}
+	return &DB{validate: validator.New(), config: &gorm.Config{}}
 }
 
 // Open initializes db session based on dialector
