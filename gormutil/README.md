@@ -2,27 +2,39 @@
 
 > Opinionated utilities for Gorm
 
-## Requirements
-
-gormutil includes
-
-* ModelBase
-    - primary key named `ID` and is in [uuid](https://github.com/google/uuid) format
-    - assumes each model has `CreatedAt` and `UpdatedAt` timestamps
-* Logger
-    - backed by [zerolog](https://github.com/rs/zerolog)
-    - respects `LOG_LEVEL` environment variable
-* Data Import/Export
-    - Exports filterable tables into `map[string]interface{}`
-    - Imports from `map[string]interface{}`
-* Create/Update helpers with respect of [validation](https://github.com/go-playground/validator) rules
-
 ## Install
 
 ```shell
 go get github.com/avakarev/go-util/gormutil
 ```
 
+## Usage
+```go
+package main
+
+import (
+    "log"
+
+    "github.com/nutsdb/nutsdb"
+)
+
+func main() {
+    dsn := "./data/sqlite.db"
+    if fd := os.Getenv("MYAPP_DSN"); fd != "" {
+        dsn = fd
+    }
+    sqlitedb, err := gormutil.Open(
+        sqlite.Open(dsn),
+        gormutil.WithLogger(zerologger.NewDefault()),
+        gormutil.WithLocks(),
+    )
+    if err != nil {
+        return err
+    }
+    db = sqlitedb
+}
+
+```
 
 ## License
 

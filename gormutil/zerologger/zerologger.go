@@ -1,4 +1,5 @@
-package gormutil
+// Package zerologger implements gorm zerolog adapter
+package zerologger
 
 import (
 	"os"
@@ -9,11 +10,8 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-// Logger is a zerolog-backed gorm logger
-var Logger logger.Interface
-
-// NewLogger returns new logger value
-func NewLogger(lvl logger.LogLevel) logger.Interface {
+// New returns new logger value
+func New(lvl logger.LogLevel) logger.Interface {
 	zlog := log.Output(zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC822}).With().Caller().Logger()
 	return logger.New(
 		&zlog, // io writer
@@ -26,10 +24,10 @@ func NewLogger(lvl logger.LogLevel) logger.Interface {
 	)
 }
 
-func init() {
+// NewDefault returns new logger value with default level
+func NewDefault() logger.Interface {
 	if lvl := os.Getenv("LOG_LEVEL"); lvl == zerolog.DebugLevel.String() {
-		Logger = NewLogger(logger.Info)
-	} else {
-		Logger = NewLogger(logger.Error)
+		return New(logger.Info)
 	}
+	return New(logger.Error)
 }

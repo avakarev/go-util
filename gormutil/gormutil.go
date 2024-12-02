@@ -12,13 +12,16 @@ import (
 
 // DB defines db container
 type DB struct {
-	mu             sync.Mutex
-	lockingEnabled bool
-	conn           *gorm.DB
-	config         *gorm.Config
-	validate       *validator.Validate
-	hooks          *HookBus
+	mu           sync.Mutex
+	locksEnabled bool
+	conn         *gorm.DB
+	config       *gorm.Config
+	validate     *validator.Validate
+	hooks        *HookBus
 }
+
+// ConfigureFunc defines configurator func
+type ConfigureFunc func(*DB) error
 
 // Conn returns gorm's connection
 func (db *DB) Conn() *gorm.DB {
@@ -64,56 +67,49 @@ func (db *DB) AfterDeleteHook(model interface{}) {
 }
 
 // WithHooks enables hooks pub/sub
-func (db *DB) WithHooks() *DB {
+func (db *DB) WithHooks() {
 	if db.hooks == nil {
 		db.hooks = newHookBus()
 		go db.hooks.run()
 	}
-	return db
 }
 
-// WithLocking enables mutex locking during create/update/delete calls
-func (db *DB) WithLocking() *DB {
-	db.lockingEnabled = true
-	return db
+// WithLocks enables mutex locks during create/update/delete calls
+func WithLocks() ConfigureFunc {
+	return func(db *DB) error {
+		db.locksEnabled = true
+		return nil
+	}
 }
 
 // WithLogger sets given logger as gorm logger
-func (db *DB) WithLogger(l logger.Interface) *DB {
-	db.config.Logger = l
-	return db
+func WithLogger(l logger.Interface) ConfigureFunc {
+	return func(db *DB) error {
+		db.config.Logger = l
+		return nil
+	}
 }
 
 // WithNowFunc sets given func as gorm now func
-func (db *DB) WithNowFunc(fn func() time.Time) *DB {
-	db.config.NowFunc = fn
-	return db
+func WithNowFunc(fn func() time.Time) ConfigureFunc {
+	return func(db *DB) error {
+		db.config.NowFunc = fn
+		return nil
+	}
 }
 
 // Open initializes db session based on dialector
-func (db *DB) Open(dialector gorm.Dialector) error {
+func Open(dialector gorm.Dialector, fns ...ConfigureFunc) (*DB, error) {
+	db := &DB{config: &gorm.Config{}, validate: validator.New()}
+	for _, fn := range fns {
+		if err := fn(db); err != nil {
+			return nil, err
+		}
+	}
 	conn, err := gorm.Open(dialector, db.config)
-	if err != nil {
-		return err
-	}
-	db.conn = conn
-	return nil
-}
-
-// New returns new DB value
-func New() *DB {
-	return &DB{validate: validator.New(), config: &gorm.Config{}}
-}
-
-// Open initializes db session based on dialector
-// Deprecated: use gormutil.New().Open() instead
-func Open(dialector gorm.Dialector) (*DB, error) {
-	config := &gorm.Config{
-		Logger: Logger,
-	}
-	conn, err := gorm.Open(dialector, config)
 	if err != nil {
 		return nil, err
 	}
-	return &DB{conn: conn, config: config, validate: validator.New()}, nil
+	db.conn = conn
+	return db, nil
 }

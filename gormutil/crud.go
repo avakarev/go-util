@@ -1,12 +1,12 @@
 package gormutil
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"reflect"
 
 	"github.com/google/uuid"
-	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 )
@@ -15,8 +15,8 @@ import (
 func First[T any](tx *gorm.DB) *T {
 	var model T
 	if err := tx.First(&model).Error; err != nil {
-		if !errors.Is(err, gorm.ErrRecordNotFound) {
-			log.Error().Err(err).Msg("error while querying db")
+		if !errors.Is(err, gorm.ErrRecordNotFound) && tx.Config.Logger != nil {
+			tx.Config.Logger.Error(context.Background(), "failed to query database, got error %v", err)
 		}
 		return nil
 	}
@@ -27,8 +27,8 @@ func First[T any](tx *gorm.DB) *T {
 func Find[T any](tx *gorm.DB) []T {
 	var models []T
 	if err := tx.Find(&models).Error; err != nil {
-		if !errors.Is(err, gorm.ErrRecordNotFound) {
-			log.Error().Err(err).Msg("error while querying db")
+		if !errors.Is(err, gorm.ErrRecordNotFound) && tx.Config.Logger != nil {
+			tx.Config.Logger.Error(context.Background(), "failed to query database, got error %v", err)
 		}
 		return nil
 	}
@@ -58,8 +58,8 @@ func (db *DB) ExistsBy(model interface{}, cond interface{}, args ...interface{})
 	q := db.Conn().
 		Model(model).Select("count(*) > 0").
 		Where(cond, args)
-	if err := q.Find(&exists).Error; err != nil {
-		log.Error().Err(err).Send()
+	if err := q.Find(&exists).Error; err != nil && db.config.Logger != nil {
+		db.config.Logger.Error(context.Background(), "failed to query database, got error %v", err)
 	}
 	return exists
 }
@@ -76,7 +76,7 @@ func (db *DB) Validate(model interface{}) error {
 
 // Create validates and persists new record
 func (db *DB) Create(model interface{}) error {
-	if db.lockingEnabled {
+	if db.locksEnabled {
 		db.mu.Lock()
 		defer db.mu.Unlock()
 	}
@@ -116,7 +116,7 @@ func Changeset(model interface{}, names []string) (map[string]interface{}, error
 
 // Update validates and persists existing record
 func (db *DB) Update(model interface{}, names ...string) error {
-	if db.lockingEnabled {
+	if db.locksEnabled {
 		db.mu.Lock()
 		defer db.mu.Unlock()
 	}
@@ -144,7 +144,7 @@ func (db *DB) Update(model interface{}, names ...string) error {
 
 // Delete deletes given record from the db table
 func (db *DB) Delete(model interface{}, conds ...interface{}) error {
-	if db.lockingEnabled {
+	if db.locksEnabled {
 		db.mu.Lock()
 		defer db.mu.Unlock()
 	}
