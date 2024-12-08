@@ -17,7 +17,6 @@ import (
 type Client struct {
 	env           envutil.AppEnv
 	conn          *nats.Conn
-	connJSON      *nats.EncodedConn
 	subscriptions map[*nats.Subscription]struct{}
 }
 
@@ -37,7 +36,11 @@ func (c *Client) Publish(subj string, data []byte) error {
 
 // PublishJSON marshalls given pointer destination into JSON and sends to the given subject
 func (c *Client) PublishJSON(subj string, data interface{}) error {
-	return c.connJSON.Publish(c.envSubj(subj), data)
+	bytes, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	return c.conn.Publish(c.envSubj(subj), bytes)
 }
 
 // Subscribe subscribes given handler to the given subject
@@ -62,17 +65,6 @@ func (c *Client) QueueSubscribe(subj string, queue string, fn nats.MsgHandler) e
 	return nil
 }
 
-// SubscribeJSON subscribes given handler to the given subject
-func (c *Client) SubscribeJSON(subj string, fn nats.Handler) error {
-	sub, err := c.connJSON.Subscribe(c.envSubj(subj), fn)
-	if err != nil {
-		return err
-	}
-	log.Debug().Str("subject", sub.Subject).Msg("nats: subscribed")
-	c.subscriptions[sub] = struct{}{}
-	return nil
-}
-
 // Request sends request and returns reply's message
 func (c *Client) Request(subj string, v any, timeout time.Duration) (*nats.Msg, error) {
 	if v != nil {
@@ -93,7 +85,6 @@ func (c *Client) Close() error {
 		}
 		delete(c.subscriptions, sub)
 	}
-	c.connJSON.Close()
 	c.conn.Close()
 	return nil
 }
@@ -116,14 +107,9 @@ func NewClient(config *Config) (*Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	connj, err := nats.NewEncodedConn(conn, nats.JSON_ENCODER)
-	if err != nil {
-		return nil, err
-	}
 	return &Client{
 		env:           config.Env,
 		conn:          conn,
-		connJSON:      connj,
 		subscriptions: make(map[*nats.Subscription]struct{}),
 	}, nil
 }
