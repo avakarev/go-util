@@ -77,6 +77,15 @@ func (c *Client) Request(subj string, v any, timeout time.Duration) (*nats.Msg, 
 	return c.conn.Request(c.envSubj(subj), nil, timeout)
 }
 
+// RequestBytes sends request and returns reply's bytes
+func (c *Client) RequestBytes(subj string, v any, timeout time.Duration) ([]byte, error) {
+	resp, err := c.Request(subj, v, timeout)
+	if err != nil {
+		return nil, err
+	}
+	return resp.Data, nil
+}
+
 // Close unsubscribes consumers and closes connections
 func (c *Client) Close() error {
 	for sub := range c.subscriptions {
