@@ -26,6 +26,9 @@ func (c *BaseClient) url(path string) string {
 	if strings.HasPrefix(path, "?") {
 		return c.BaseURL + path
 	}
+	if strings.HasPrefix(path, "https://") || strings.HasPrefix(path, "http://") {
+		return path
+	}
 	return strings.TrimRight(c.BaseURL, "/") + "/" + strings.TrimLeft(path, "/")
 }
 
