@@ -86,6 +86,15 @@ func (c *Client) RequestBytes(subj string, v any, timeout time.Duration) ([]byte
 	return resp.Data, nil
 }
 
+// RequestJSON sends requests and unmarshals reply's json bytes into given destination
+func (c *Client) RequestJSON(subj string, v any, timeout time.Duration, destPtr any) error {
+	bytes, err := c.RequestBytes(subj, v, timeout)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(bytes, destPtr)
+}
+
 // Close unsubscribes consumers and closes connections
 func (c *Client) Close() error {
 	for sub := range c.subscriptions {
