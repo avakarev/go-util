@@ -16,6 +16,7 @@ import (
 type BaseClient struct {
 	BaseURL string
 	Header  http.Header
+	Cookies []http.Cookie
 	Timeout time.Duration
 }
 
@@ -52,6 +53,10 @@ func (c *BaseClient) Req(method string, path string, payload any) (*http.Respons
 		for _, value := range values {
 			r.Header.Add(key, value)
 		}
+	}
+
+	for i := range c.Cookies {
+		r.AddCookie(&c.Cookies[i])
 	}
 
 	return (&http.Client{
