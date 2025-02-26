@@ -12,15 +12,15 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// BaseClient implements base http client
-type BaseClient struct {
+// Client implements base http client
+type Client struct {
 	BaseURL string
 	Header  http.Header
 	Cookies []http.Cookie
 	Timeout time.Duration
 }
 
-func (c *BaseClient) url(path string) string {
+func (c *Client) url(path string) string {
 	if path == "" {
 		return c.BaseURL
 	}
@@ -34,7 +34,7 @@ func (c *BaseClient) url(path string) string {
 }
 
 // Req performs new http request with given method, path and optional json body
-func (c *BaseClient) Req(method string, path string, payload any) (*http.Response, error) {
+func (c *Client) Req(method string, path string, payload any) (*http.Response, error) {
 	var body io.Reader
 	if payload != nil {
 		data, err := json.Marshal(payload)
@@ -65,7 +65,7 @@ func (c *BaseClient) Req(method string, path string, payload any) (*http.Respons
 }
 
 // Get makes get request and returns response body
-func (c *BaseClient) Get(path string) ([]byte, int, error) {
+func (c *Client) Get(path string) ([]byte, int, error) {
 	resp, err := c.Req(http.MethodGet, path, nil)
 	if err != nil {
 		return nil, 0, err
@@ -80,7 +80,7 @@ func (c *BaseClient) Get(path string) ([]byte, int, error) {
 	return bytes, resp.StatusCode, err
 }
 
-func (c *BaseClient) decodeJSON(resp *http.Response, destPtr any) (int, error) {
+func (c *Client) decodeJSON(resp *http.Response, destPtr any) (int, error) {
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
 			log.Error().Err(err).Send()
@@ -95,7 +95,7 @@ func (c *BaseClient) decodeJSON(resp *http.Response, destPtr any) (int, error) {
 }
 
 // GetJSON makes get request and decodes response body as json
-func (c *BaseClient) GetJSON(path string, destPtr any) (int, error) {
+func (c *Client) GetJSON(path string, destPtr any) (int, error) {
 	resp, err := c.Req(http.MethodGet, path, nil)
 	if err != nil {
 		return 0, err
@@ -104,7 +104,7 @@ func (c *BaseClient) GetJSON(path string, destPtr any) (int, error) {
 }
 
 // PostJSON makes post request and decodes response body as json
-func (c *BaseClient) PostJSON(path string, payload any, destPtr any) (int, error) {
+func (c *Client) PostJSON(path string, payload any, destPtr any) (int, error) {
 	resp, err := c.Req(http.MethodPost, path, payload)
 	if err != nil {
 		return 0, err
@@ -113,7 +113,7 @@ func (c *BaseClient) PostJSON(path string, payload any, destPtr any) (int, error
 }
 
 // PutJSON makes put request and decodes response body as json
-func (c *BaseClient) PutJSON(path string, payload any, destPtr any) (int, error) {
+func (c *Client) PutJSON(path string, payload any, destPtr any) (int, error) {
 	resp, err := c.Req(http.MethodPut, path, payload)
 	if err != nil {
 		return 0, err
@@ -122,7 +122,7 @@ func (c *BaseClient) PutJSON(path string, payload any, destPtr any) (int, error)
 }
 
 // DelJSON makes delete request and decodes response body as json
-func (c *BaseClient) DelJSON(path string, payload any, destPtr any) (int, error) {
+func (c *Client) DelJSON(path string, payload any, destPtr any) (int, error) {
 	resp, err := c.Req(http.MethodDelete, path, payload)
 	if err != nil {
 		return 0, err
