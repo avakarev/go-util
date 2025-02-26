@@ -17,7 +17,7 @@ type item struct {
 }
 
 type testClient struct {
-	base httputil.BaseClient
+	base httputil.Client
 }
 
 func (tc *testClient) getItemByID(id string) (*item, error) {
@@ -36,7 +36,7 @@ func (tc *testClient) submit() error {
 
 func newTestClient() *testClient {
 	return &testClient{
-		base: httputil.BaseClient{
+		base: httputil.Client{
 			BaseURL: "https://example.org",
 			Header: http.Header{
 				"User-Agent": []string{"my-test-ua-1.0"},
@@ -46,7 +46,7 @@ func newTestClient() *testClient {
 	}
 }
 
-func TestBaseClientGet(t *testing.T) {
+func TestClientGet(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -58,7 +58,7 @@ func TestBaseClientGet(t *testing.T) {
 	testutil.Diff(&item{ID: "1", Name: "foobar"}, i, t)
 }
 
-func TestBaseClientPostWith(t *testing.T) {
+func TestClientPostWith(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
