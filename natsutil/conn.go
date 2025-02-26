@@ -1,4 +1,3 @@
-// Package natsutil implements nats helpers
 package natsutil
 
 import (
@@ -13,14 +12,14 @@ import (
 	"github.com/avakarev/go-util/envutil"
 )
 
-// Client implements nats client
-type Client struct {
+// Conn implements nats connection
+type Conn struct {
 	env           envutil.AppEnv
 	conn          *nats.Conn
 	subscriptions map[*nats.Subscription]struct{}
 }
 
-func (c *Client) envSubj(subj string) string {
+func (c *Conn) envSubj(subj string) string {
 	if strings.HasPrefix(subj, envutil.EnvDev) ||
 		strings.HasPrefix(subj, envutil.EnvBeta) ||
 		strings.HasPrefix(subj, envutil.EnvProd) {
@@ -30,12 +29,12 @@ func (c *Client) envSubj(subj string) string {
 }
 
 // Publish sends byte slice to the given subject
-func (c *Client) Publish(subj string, data []byte) error {
+func (c *Conn) Publish(subj string, data []byte) error {
 	return c.conn.Publish(c.envSubj(subj), data)
 }
 
 // PublishJSON marshalls given pointer destination into JSON and sends to the given subject
-func (c *Client) PublishJSON(subj string, data interface{}) error {
+func (c *Conn) PublishJSON(subj string, data interface{}) error {
 	bytes, err := json.Marshal(data)
 	if err != nil {
 		return err
@@ -44,7 +43,7 @@ func (c *Client) PublishJSON(subj string, data interface{}) error {
 }
 
 // Subscribe subscribes given handler to the given subject
-func (c *Client) Subscribe(subj string, fn nats.MsgHandler) error {
+func (c *Conn) Subscribe(subj string, fn nats.MsgHandler) error {
 	sub, err := c.conn.Subscribe(c.envSubj(subj), fn)
 	if err != nil {
 		return err
@@ -55,7 +54,7 @@ func (c *Client) Subscribe(subj string, fn nats.MsgHandler) error {
 }
 
 // QueueSubscribe subscribes given handler to the given subject
-func (c *Client) QueueSubscribe(subj string, queue string, fn nats.MsgHandler) error {
+func (c *Conn) QueueSubscribe(subj string, queue string, fn nats.MsgHandler) error {
 	sub, err := c.conn.QueueSubscribe(c.envSubj(subj), queue, fn)
 	if err != nil {
 		return err
@@ -66,7 +65,7 @@ func (c *Client) QueueSubscribe(subj string, queue string, fn nats.MsgHandler) e
 }
 
 // Request sends request and returns reply's message
-func (c *Client) Request(subj string, v any, timeout time.Duration) (*nats.Msg, error) {
+func (c *Conn) Request(subj string, v any, timeout time.Duration) (*nats.Msg, error) {
 	if v != nil {
 		dataBytes, err := json.Marshal(v)
 		if err != nil {
@@ -78,7 +77,7 @@ func (c *Client) Request(subj string, v any, timeout time.Duration) (*nats.Msg, 
 }
 
 // RequestBytes sends request and returns reply's bytes
-func (c *Client) RequestBytes(subj string, v any, timeout time.Duration) ([]byte, error) {
+func (c *Conn) RequestBytes(subj string, v any, timeout time.Duration) ([]byte, error) {
 	resp, err := c.Request(subj, v, timeout)
 	if err != nil {
 		return nil, err
@@ -87,7 +86,7 @@ func (c *Client) RequestBytes(subj string, v any, timeout time.Duration) ([]byte
 }
 
 // RequestJSON sends requests and unmarshals reply's json bytes into given destination
-func (c *Client) RequestJSON(subj string, v any, timeout time.Duration, destPtr any) error {
+func (c *Conn) RequestJSON(subj string, v any, timeout time.Duration, destPtr any) error {
 	bytes, err := c.RequestBytes(subj, v, timeout)
 	if err != nil {
 		return err
@@ -96,7 +95,7 @@ func (c *Client) RequestJSON(subj string, v any, timeout time.Duration, destPtr 
 }
 
 // Close unsubscribes consumers and closes connections
-func (c *Client) Close() error {
+func (c *Conn) Close() error {
 	for sub := range c.subscriptions {
 		if err := sub.Unsubscribe(); err != nil {
 			return err
@@ -107,33 +106,37 @@ func (c *Client) Close() error {
 	return nil
 }
 
-// Config defines client configuration
-type Config struct {
-	Env      envutil.AppEnv
-	URL      string
-	User     string
-	Password string
-	Timeout  time.Duration
+// ConnConfig defines connection configuration
+type ConnConfig struct {
+	Env           envutil.AppEnv
+	URL           string
+	User          string
+	Password      string
+	Timeout       time.Duration
 }
 
-// NewClient returns new client value
-func NewClient(config *Config) (*Client, error) {
+// NewConn returns new connection value
+func NewConn(config *ConnConfig) (*Conn, error) {
 	if config.Timeout == 0 {
 		config.Timeout = 5 * time.Second
 	}
-	conn, err := nats.Connect(config.URL, nats.UserInfo(config.User, config.Password), nats.Timeout(config.Timeout))
+	conn, err := nats.Connect(
+		config.URL,
+		nats.UserInfo(config.User, config.Password),
+		nats.Timeout(config.Timeout),
+	)
 	if err != nil {
 		return nil, err
 	}
-	return &Client{
+	return &Conn{
 		env:           config.Env,
 		conn:          conn,
 		subscriptions: make(map[*nats.Subscription]struct{}),
 	}, nil
 }
 
-// DefaultClient returns new client initialized from env variables
-func DefaultClient() (*Client, error) {
+// DefaultConn returns new connection initialized from env variables
+func DefaultConn() (*Conn, error) {
 	env, err := envutil.NewAppEnv()
 	if err != nil {
 		return nil, err
@@ -150,7 +153,7 @@ func DefaultClient() (*Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	return NewClient(&Config{
+	return NewConn(&ConnConfig{
 		Env:      env,
 		URL:      url,
 		User:     user,

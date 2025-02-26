@@ -1,3 +1,4 @@
+// Package natsutil implements nats helpers
 package natsutil
 
 import (
