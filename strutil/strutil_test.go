@@ -55,3 +55,18 @@ func TestIsUUID(t *testing.T) {
 	testutil.Diff(true, strutil.IsUUID("00000000-0000-0000-0000-000000000000"), t)
 	testutil.Diff(true, strutil.IsUUID("ed811898-264d-4196-a956-0767316ff687"), t)
 }
+
+func TestUnique(t *testing.T) {
+	cases := []struct {
+		strs []string
+		want []string
+	}{
+		{strs: []string{}, want: []string{}},
+		{strs: []string{"foo", "bar"}, want: []string{"foo", "bar"}},
+		{strs: []string{"apple", "banana", "apple", "orange", "banana", "grape"}, want: []string{"apple", "banana", "orange", "grape"}},
+	}
+	for i := range cases {
+		got := strutil.Unique(cases[i].strs)
+		testutil.Diff(cases[i].want, got, t)
+	}
+}
