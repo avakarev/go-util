@@ -44,3 +44,20 @@ func IsUUID(s string) bool {
 	}
 	return false
 }
+
+// Unique returns new slice with unique elements
+func Unique(keys []string) []string {
+	if len(keys) == 0 {
+		return keys
+	}
+	seen := make(map[string]struct{})
+	unique := make([]string, 0)
+	for _, k := range keys {
+		if _, has := seen[k]; has {
+			continue
+		}
+		seen[k] = struct{}{}
+		unique = append(unique, k)
+	}
+	return unique
+}
