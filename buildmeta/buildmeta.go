@@ -58,8 +58,8 @@ func Timezone() string {
 }
 
 // Fields returns build meta as map
-func Fields() map[string]interface{} {
-	return map[string]interface{}{
+func Fields() map[string]any {
+	return map[string]any{
 		"compiler": Compiler(),
 		"os":       OS(),
 		"arch":     Arch(),

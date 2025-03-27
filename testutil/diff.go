@@ -9,7 +9,7 @@ import (
 )
 
 // Diff fails the test if `want` differs from `got`, and prints human-readable error
-func Diff(want interface{}, got interface{}, t *testing.T) {
+func Diff(want any, got any, t *testing.T) {
 	// ignore all unexported fields
 	opts := cmp.FilterPath(func(p cmp.Path) bool {
 		sf, ok := p.Index(-1).(cmp.StructField)
