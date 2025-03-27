@@ -28,6 +28,27 @@ func (db *DB) Conn() *gorm.DB {
 	return db.conn
 }
 
+// Begin begins a transaction
+func (db *DB) Begin() *DB {
+	return &DB{
+		locksEnabled: db.locksEnabled,
+		conn:         db.conn.Begin(),
+		config:       db.config,
+		validate:     db.validate,
+		hooks:        db.hooks,
+	}
+}
+
+// Rollback rollbacks the transaction
+func (db *DB) Rollback() {
+	db.conn.Rollback()
+}
+
+// Commit commits the transaction
+func (db *DB) Commit() error {
+	return db.conn.Commit().Error
+}
+
 // RegisterValidation adds a custom validation for the given tag
 func (db *DB) RegisterValidation(tag string, fn validator.Func) error {
 	return db.validate.RegisterValidation(tag, fn)
