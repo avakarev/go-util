@@ -40,8 +40,8 @@ func (db *DB) Tables(filter *TableFilter) ([]string, error) {
 }
 
 // ExportTable returns all rows of given table as slice of maps
-func (db *DB) ExportTable(table string) ([]map[string]interface{}, error) {
-	var rows []map[string]interface{}
+func (db *DB) ExportTable(table string) ([]map[string]any, error) {
+	var rows []map[string]any
 	if err := db.Conn().Table(table).Find(&rows).Error; err != nil {
 		return nil, err
 	}
@@ -49,13 +49,13 @@ func (db *DB) ExportTable(table string) ([]map[string]interface{}, error) {
 }
 
 // Export returns map of all tables with their rows
-func (db *DB) Export(filter *TableFilter) (map[string]interface{}, error) {
+func (db *DB) Export(filter *TableFilter) (map[string]any, error) {
 	tables, err := db.Tables(filter)
 	if err != nil {
 		return nil, err
 	}
 
-	m := make(map[string]interface{})
+	m := make(map[string]any)
 	for _, t := range tables {
 		data, err := db.ExportTable(t)
 		if err != nil {
@@ -68,7 +68,7 @@ func (db *DB) Export(filter *TableFilter) (map[string]interface{}, error) {
 }
 
 // ImportTable inserts given rows into given table
-func (db *DB) ImportTable(table string, rows []interface{}) error {
+func (db *DB) ImportTable(table string, rows []any) error {
 	for _, row := range rows {
 		if err := db.Conn().Table(table).Create(row).Error; err != nil {
 			return err
@@ -78,7 +78,7 @@ func (db *DB) ImportTable(table string, rows []interface{}) error {
 }
 
 // Import inserts given data into db
-func (db *DB) Import(data map[string]interface{}, filter *TableFilter) error {
+func (db *DB) Import(data map[string]any, filter *TableFilter) error {
 	tables, err := db.Tables(filter)
 	if err != nil {
 		return err
@@ -89,7 +89,7 @@ func (db *DB) Import(data map[string]interface{}, filter *TableFilter) error {
 		if !ok {
 			continue
 		}
-		rows, ok := value.([]interface{})
+		rows, ok := value.([]any)
 		if !ok {
 			continue
 		}

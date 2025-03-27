@@ -41,7 +41,7 @@ func (e HookEvent) IsAfterDelete() bool {
 // Hook defines hook event
 type Hook struct {
 	Table string
-	Model interface{}
+	Model any
 	Event HookEvent
 }
 
@@ -66,7 +66,7 @@ type HookBus struct {
 	publishChan chan *Hook
 }
 
-func (hb *HookBus) publish(model interface{}, event HookEvent) {
+func (hb *HookBus) publish(model any, event HookEvent) {
 	hb.publishChan <- &Hook{
 		Table: tableName(model),
 		Model: model,
@@ -74,7 +74,7 @@ func (hb *HookBus) publish(model interface{}, event HookEvent) {
 	}
 }
 
-func (hb *HookBus) subscribe(model interface{}, fn HookHandlerFunc) {
+func (hb *HookBus) subscribe(model any, fn HookHandlerFunc) {
 	hb.subscribeChan <- &HookSubscription{
 		table:   tableName(model),
 		handler: fn,
@@ -104,7 +104,7 @@ func (hb *HookBus) run() {
 	}
 }
 
-func tableName(v interface{}) string {
+func tableName(v any) string {
 	value := reflect.ValueOf(v)
 	modelType := reflect.Indirect(value).Type()
 	if modelType.Kind() == reflect.Ptr {

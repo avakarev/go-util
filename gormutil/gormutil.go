@@ -60,28 +60,28 @@ func (db *DB) RegisterValidationTagNameFunc(fn validator.TagNameFunc) {
 }
 
 // SubscribeHook creates subscription for create/update/delete changes of given model
-func (db *DB) SubscribeHook(model interface{}, fn HookHandlerFunc) {
+func (db *DB) SubscribeHook(model any, fn HookHandlerFunc) {
 	if db.hooks != nil {
 		db.hooks.subscribe(model, fn)
 	}
 }
 
 // AfterCreateHook publishes hook after create
-func (db *DB) AfterCreateHook(model interface{}) {
+func (db *DB) AfterCreateHook(model any) {
 	if db.hooks != nil {
 		db.hooks.publish(model, HookEvent(HookAfterCreate))
 	}
 }
 
 // AfterUpdateHook publishes hook after update
-func (db *DB) AfterUpdateHook(model interface{}) {
+func (db *DB) AfterUpdateHook(model any) {
 	if db.hooks != nil {
 		db.hooks.publish(model, HookEvent(HookAfterUpdate))
 	}
 }
 
 // AfterDeleteHook publishes hook after delete
-func (db *DB) AfterDeleteHook(model interface{}) {
+func (db *DB) AfterDeleteHook(model any) {
 	if db.hooks != nil {
 		db.hooks.publish(model, HookEvent(HookAfterDelete))
 	}
