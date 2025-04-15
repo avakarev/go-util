@@ -3,8 +3,10 @@ package httputil
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/avakarev/go-util/strutil"
 	"github.com/go-playground/validator/v10"
@@ -73,9 +75,27 @@ func StdErrMsg(code int) string {
 func ValidationErrMsg(err validator.FieldError) string {
 	switch err.Tag() {
 	case "required":
-		return "required"
+		return "required but missing"
+	case "eq":
+		return fmt.Sprintf("must be equal to %q", err.Param())
+	case "oneof":
+		return fmt.Sprintf("must be one of %q", strings.ReplaceAll(err.Param(), " ", ", "))
+	case "numeric":
+		return "must be numeric"
 	case "email":
 		return "invalid email format"
+	case "datetime":
+		return fmt.Sprintf(
+			"must have datetime format %q",
+			strings.NewReplacer(
+				"2006", "YYYY",
+				"01", "MM",
+				"02", "DD",
+				"15", "hh",
+				"04", "mm",
+				"05", "ss",
+			).Replace(err.Param()),
+		)
 	}
 	return "invalid"
 }

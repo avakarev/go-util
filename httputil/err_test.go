@@ -37,9 +37,9 @@ func TestNewValidationErr(t *testing.T) {
 			Code: 400,
 			Msg:  "validation error",
 			Items: []httputil.ValidationErr{
-				{Subject: "name", Msg: "required"},
-				{Subject: "ipv4", Msg: "required"},
-				{Subject: "some", Msg: "required"},
+				{Subject: "name", Msg: "required but missing"},
+				{Subject: "ipv4", Msg: "required but missing"},
+				{Subject: "some", Msg: "required but missing"},
 			},
 		},
 	}, resp, t)
