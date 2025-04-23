@@ -36,7 +36,7 @@ func (env AppEnv) IsProd() bool {
 
 // NewAppEnv returns new AppEnv value
 func NewAppEnv() (AppEnv, error) {
-	s, err := MustStr("APP_ENV")
+	s, err := ShouldStr("APP_ENV")
 	if err != nil {
 		return AppEnv(""), err
 	}

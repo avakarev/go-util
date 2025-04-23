@@ -156,15 +156,15 @@ func DefaultConn() (*Conn, error) {
 	if err != nil {
 		return nil, err
 	}
-	url, err := envutil.MustStr("NATS_URL")
+	url, err := envutil.ShouldStr("NATS_URL")
 	if err != nil {
 		return nil, err
 	}
-	user, err := envutil.MustStr("NATS_USER")
+	user, err := envutil.ShouldStr("NATS_USER")
 	if err != nil {
 		return nil, err
 	}
-	password, err := envutil.MustStr("NATS_PASSWORD")
+	password, err := envutil.ShouldStr("NATS_PASSWORD")
 	if err != nil {
 		return nil, err
 	}
