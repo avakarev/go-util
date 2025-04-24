@@ -17,12 +17,12 @@ import (
 // Peer implements connection's peer
 type Peer struct {
 	wsutil.BasePeer
-	key string
+	id string
 }
 
 // Match checks whether given peer is quialified to recevive email
-func (p *Peer) Match(key string) bool {
-	return p.key == key
+func (p *Peer) Match(id string) bool {
+	return p.id == id
 }
 
 // Hub maintains the set of active peers and handles communication
@@ -38,7 +38,7 @@ func (h *Hub) Handler(conn *websocket.Conn) {
 	}()
 
 	// register the peer
-	h.Register(&wsutil.PeerRequest{Conn: conn, Peer: &Peer{pipelineID: conn.Params("id")}})
+	h.Register(&wsutil.PeerRequest{Conn: conn, Peer: &Peer{id: conn.Params("id")}})
 
 	for {
 		_, _, err := conn.ReadMessage()
