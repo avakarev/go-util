@@ -2,8 +2,7 @@ package wsutil
 
 import (
 	"encoding/json"
-
-	"github.com/rs/zerolog/log"
+	"fmt"
 )
 
 // BroadcastHub maintains the set of active peers and handles communication
@@ -21,6 +20,8 @@ type BroadcastHub struct {
 
 	// Broadcast message to peers that match the topic
 	broadcast chan *Event
+
+	config Config
 }
 
 func (h *BroadcastHub) run() {
@@ -32,7 +33,7 @@ func (h *BroadcastHub) run() {
 			// remove the peer from the hub
 			delete(h.peers, conn)
 			if err := conn.Close(); err != nil {
-				log.Warn().Err(err).Send()
+				h.config.ErrorHandler(fmt.Errorf("on conn close: %w", err))
 			}
 		case event := <-h.broadcast:
 			for conn, peer := range h.peers {
@@ -47,13 +48,13 @@ func (h *BroadcastHub) run() {
 						return
 					}
 					if err := conn.WriteMessage(TextMessage, event.Data); err != nil {
-						log.Error().Err(err).Msg("ws write error")
+						h.config.ErrorHandler(fmt.Errorf("on conn write: %w", err))
 						peer.Close()
 						if err := conn.WriteMessage(CloseMessage, []byte{}); err != nil {
-							log.Warn().Err(err).Send()
+							h.config.ErrorHandler(fmt.Errorf("on conn write: %w", err))
 						}
 						if err := conn.Close(); err != nil {
-							log.Warn().Err(err).Send()
+							h.config.ErrorHandler(fmt.Errorf("on conn close: %w", err))
 						}
 						h.unregister <- conn
 					}
@@ -100,16 +101,27 @@ func (h *BroadcastHub) BroadcastJSON(topic string, v any) error {
 // TryBroadcastJSON marshals and sends given pointer destination to all connected peers
 func (h *BroadcastHub) TryBroadcastJSON(topic string, v any) {
 	if err := h.BroadcastJSON(topic, v); err != nil {
-		log.Error().Err(err).Msgf("can't broadcast json (topic=%s)", topic)
+		h.config.ErrorHandler(fmt.Errorf("on broadcast json: %w", err))
 	}
 }
 
 // NewBroadcastHub returns new hub value
-func NewBroadcastHub() *BroadcastHub {
-	return &BroadcastHub{
+func NewBroadcastHub(config ...Config) *BroadcastHub {
+	hub := &BroadcastHub{
 		peers:      make(map[Conn]Peer),
 		register:   make(chan *PeerRequest),
 		unregister: make(chan Conn),
 		broadcast:  make(chan *Event),
+		config:     Config{},
 	}
+
+	if len(config) > 0 {
+		hub.config = config[0]
+	}
+
+	if hub.config.ErrorHandler == nil {
+		hub.config.ErrorHandler = DefaultErrorHandler
+	}
+
+	return hub
 }
