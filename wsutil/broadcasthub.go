@@ -73,6 +73,11 @@ func (h *BroadcastHub) Run() {
 	h.isRunning = true
 }
 
+// CountPeers returns number of connected peers
+func (h *BroadcastHub) CountPeers() int {
+	return len(h.peers)
+}
+
 // Register handles new peer connection request
 func (h *BroadcastHub) Register(req *PeerRequest) {
 	h.register <- req
