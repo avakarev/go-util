@@ -37,7 +37,7 @@ func (c *Conn) Publish(subj string, data []byte) error {
 	return nil
 }
 
-// PublishJSON marshalls given pointer destination into JSON and sends to the given subject
+// PublishJSON marshals given pointer destination into JSON and sends to the given subject
 func (c *Conn) PublishJSON(subj string, data any) error {
 	bytes, err := json.Marshal(data)
 	if err != nil {
