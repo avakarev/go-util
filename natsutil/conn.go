@@ -17,6 +17,7 @@ type Conn struct {
 	env           envutil.AppEnv
 	conn          *nats.Conn
 	subscriptions map[*nats.Subscription]struct{}
+	ErrHandler    ErrHandlerFunc
 }
 
 func (c *Conn) enrichSubj(subj string) string {
@@ -47,9 +48,13 @@ func (c *Conn) PublishJSON(subj string, data any) error {
 }
 
 // Subscribe subscribes given handler to the given subject
-func (c *Conn) Subscribe(subj string, fn nats.MsgHandler) error {
+func (c *Conn) Subscribe(subj string, fn MsgHandlerFunc) error {
 	subj = c.enrichSubj(subj)
-	sub, err := c.conn.Subscribe(subj, fn)
+	sub, err := c.conn.Subscribe(subj, func(msg *nats.Msg) {
+		if err := fn(msg); err != nil {
+			c.ErrHandler(msg, err)
+		}
+	})
 	if err != nil {
 		return fmt.Errorf("%w, subj=%q", err, subj)
 	}
@@ -128,25 +133,32 @@ type ConnConfig struct {
 	User          string
 	Password      string
 	Timeout       time.Duration
+	ErrHandler    ErrHandlerFunc
 }
 
 // NewConn returns new connection value
 func NewConn(config *ConnConfig) (*Conn, error) {
-	if config.Timeout == 0 {
-		config.Timeout = 5 * time.Second
+	timeout := config.Timeout
+	if timeout == 0 {
+		timeout = 5 * time.Second
 	}
 	conn, err := nats.Connect(
 		config.URL,
 		nats.UserInfo(config.User, config.Password),
-		nats.Timeout(config.Timeout),
+		nats.Timeout(timeout),
 	)
 	if err != nil {
 		return nil, err
+	}
+	errHandler := config.ErrHandler
+	if errHandler == nil {
+		errHandler = DefaultErrHandler
 	}
 	return &Conn{
 		env:           config.Env,
 		conn:          conn,
 		subscriptions: make(map[*nats.Subscription]struct{}),
+		ErrHandler:    errHandler,
 	}, nil
 }
 
