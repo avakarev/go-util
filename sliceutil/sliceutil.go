@@ -4,6 +4,8 @@ package sliceutil
 import "math/rand"
 
 // Contains checks whenther given element is a member of given slice
+//
+// Deprecated: use `Contains` from builtin `slices` pkg instead (in go 1.21+)
 func Contains[T string | int | int64 | float64](slice []T, elem T) bool {
 	for _, e := range slice {
 		if elem == e {
