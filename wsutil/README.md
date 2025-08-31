@@ -20,7 +20,7 @@ type Peer struct {
 	id string
 }
 
-// Match checks whether given peer is quialified to recevive email
+// Match checks whether given peer is qualified to receive message
 func (p *Peer) Match(id string) bool {
 	return p.id == id
 }

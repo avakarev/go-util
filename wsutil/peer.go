@@ -12,7 +12,7 @@ type Peer interface {
 	Close()
 	// IsClosing checks whether peer started closing
 	IsClosing() bool
-	// Match checks whether given peer is quialified to recevive email
+	// Match checks whether given peer is qualified to receive message
 	Match(topic string) bool
 }
 
