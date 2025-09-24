@@ -1,7 +1,6 @@
 package testutil
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -25,7 +24,6 @@ func FixturePath(name string, args ...string) string {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Printf("====> working dir is %q\n", wd)
 		return filepath.Join(wd, name)
 	}
 	return filepath.Join("test", "fixtures", name)
