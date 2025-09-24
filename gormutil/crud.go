@@ -15,8 +15,8 @@ import (
 func First[T any](tx *gorm.DB) *T {
 	var model T
 	if err := tx.First(&model).Error; err != nil {
-		if !errors.Is(err, gorm.ErrRecordNotFound) && tx.Config.Logger != nil {
-			tx.Config.Logger.Error(context.Background(), "failed to query database, got error %v", err)
+		if !errors.Is(err, gorm.ErrRecordNotFound) && tx.Logger != nil {
+			tx.Logger.Error(context.Background(), "failed to query database, got error %v", err)
 		}
 		return nil
 	}
@@ -27,8 +27,8 @@ func First[T any](tx *gorm.DB) *T {
 func Find[T any](tx *gorm.DB) []T {
 	var models []T
 	if err := tx.Find(&models).Error; err != nil {
-		if !errors.Is(err, gorm.ErrRecordNotFound) && tx.Config.Logger != nil {
-			tx.Config.Logger.Error(context.Background(), "failed to query database, got error %v", err)
+		if !errors.Is(err, gorm.ErrRecordNotFound) && tx.Logger != nil {
+			tx.Logger.Error(context.Background(), "failed to query database, got error %v", err)
 		}
 		return nil
 	}
@@ -96,7 +96,7 @@ func (db *DB) Create(model any) error {
 func Changeset(model any, names []string) (map[string]any, error) {
 	data := make(map[string]any)
 	source := reflect.ValueOf(model)
-	if source.Kind() != reflect.Ptr {
+	if source.Kind() != reflect.Pointer {
 		return nil, fmt.Errorf("model is expected to be <ptr>, instead <%T> is given", model)
 	}
 	source = source.Elem() // dereference the ptr
@@ -160,7 +160,7 @@ func (db *DB) Delete(model any, conds ...any) error {
 // DeleteByID deletes given record with given id from the db table
 func (db *DB) DeleteByID(model any, id string) error {
 	source := reflect.ValueOf(model)
-	if source.Kind() != reflect.Ptr {
+	if source.Kind() != reflect.Pointer {
 		return fmt.Errorf("model is expected to be <ptr>, instead <%T> is given", model)
 	}
 	source = source.Elem() // dereference the ptr

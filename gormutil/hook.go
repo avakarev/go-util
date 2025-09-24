@@ -107,7 +107,7 @@ func (hb *HookBus) run() {
 func tableName(v any) string {
 	value := reflect.ValueOf(v)
 	modelType := reflect.Indirect(value).Type()
-	if modelType.Kind() == reflect.Ptr {
+	if modelType.Kind() == reflect.Pointer {
 		modelType = modelType.Elem()
 	}
 	namer := schema.NamingStrategy{}
