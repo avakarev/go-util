@@ -7,10 +7,10 @@ require (
 	github.com/google/go-cmp v0.7.0
 	github.com/google/uuid v1.6.0
 	github.com/jarcoal/httpmock v1.4.1
-	github.com/nats-io/nats.go v1.45.0
+	github.com/nats-io/nats.go v1.46.0
 	github.com/rs/zerolog v1.34.0
-	golang.org/x/exp v0.0.0-20250819193227-8b4c13bb791b
-	gorm.io/gorm v1.30.2
+	golang.org/x/exp v0.0.0-20250911091902-df9299821621
+	gorm.io/gorm v1.31.0
 )
 
 require (
