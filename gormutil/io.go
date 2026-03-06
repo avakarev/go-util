@@ -1,19 +1,11 @@
 package gormutil
 
+import "slices"
+
 // TableFilter defines table filtering options
 type TableFilter struct {
 	IncludeTables []string `json:"includeTables"`
 	ExcludeTables []string `json:"excludeTables"`
-}
-
-// contains checks whenther given element is a member of given slice
-func contains[T string | int | int64 | float64](slice []T, elem T) bool {
-	for _, e := range slice {
-		if elem == e {
-			return true
-		}
-	}
-	return false
 }
 
 // FilterTables returns tables with respect of include/exclude filters
@@ -23,7 +15,7 @@ func FilterTables(tables []string, f *TableFilter) []string {
 	}
 	filteredTables := make([]string, 0)
 	for _, t := range tables {
-		if !contains(f.ExcludeTables, t) && (len(f.IncludeTables) == 0 || contains(f.IncludeTables, t)) {
+		if !slices.Contains(f.ExcludeTables, t) && (len(f.IncludeTables) == 0 || slices.Contains(f.IncludeTables, t)) {
 			filteredTables = append(filteredTables, t)
 		}
 	}

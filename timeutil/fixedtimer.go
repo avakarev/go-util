@@ -27,10 +27,8 @@ func (t *FixedTimer) Start() {
 
 	t.running = true
 	t.ticker = time.NewTicker(t.interval)
-	t.wg.Add(1)
 
-	go func() {
-		defer t.wg.Done()
+	t.wg.Go(func() {
 		for {
 			select {
 			case <-t.ticker.C:
@@ -39,7 +37,7 @@ func (t *FixedTimer) Start() {
 				return
 			}
 		}
-	}()
+	})
 }
 
 // Stop stops the timer and cleans up resources
