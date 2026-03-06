@@ -21,7 +21,7 @@ const alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz
 func String(n int) (string, error) {
 	ret := make([]byte, n)
 	length := len(alphabet)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		ret[i] = alphabet[Int(length)]
 	}
 	return string(ret), nil

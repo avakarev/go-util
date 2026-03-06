@@ -62,11 +62,15 @@ type Meta struct {
 
 // New returns new Meta value
 func New() Meta {
+	cm := Commit
+	if len(cm) > 7 {
+		cm = cm[:7]
+	}
 	return Meta{
 		Compiler:       runtime.Version(),
 		OS:             runtime.GOOS,
 		Arch:           runtime.GOARCH,
-		Commit:         Commit,
+		Commit:         cm,
 		Ref:            Ref,
 		BuildTimeUTC:   BuildTimeUTC,
 		BuildTimeLocal: buildTimeLocal,
