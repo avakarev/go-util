@@ -20,6 +20,11 @@ type Conn struct {
 	ErrHandler    ErrHandlerFunc
 }
 
+// Env returns current app env
+func (c *Conn) Env() envutil.AppEnv {
+	return c.env
+}
+
 func (c *Conn) enrichSubj(subj string) string {
 	if strings.HasPrefix(subj, envutil.EnvDev) ||
 		strings.HasPrefix(subj, envutil.EnvBeta) ||
@@ -128,12 +133,12 @@ func (c *Conn) Close() error {
 
 // ConnConfig defines connection configuration
 type ConnConfig struct {
-	Env           envutil.AppEnv
-	URL           string
-	User          string
-	Password      string
-	Timeout       time.Duration
-	ErrHandler    ErrHandlerFunc
+	Env        envutil.AppEnv
+	URL        string
+	User       string
+	Password   string
+	Timeout    time.Duration
+	ErrHandler ErrHandlerFunc
 }
 
 // NewConn returns new connection value
