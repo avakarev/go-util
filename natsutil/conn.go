@@ -12,6 +12,11 @@ import (
 	"github.com/avakarev/go-util/envutil"
 )
 
+const (
+	defaultMaxReconnect  = 60
+	defaultReconnectWait = 5 * time.Second
+)
+
 // Conn implements nats connection
 type Conn struct {
 	env           envutil.AppEnv
@@ -133,24 +138,47 @@ func (c *Conn) Close() error {
 
 // ConnConfig defines connection configuration
 type ConnConfig struct {
-	Env        envutil.AppEnv
-	URL        string
-	User       string
-	Password   string
-	Timeout    time.Duration
-	ErrHandler ErrHandlerFunc
+	Env           envutil.AppEnv
+	URL           string
+	User          string
+	Password      string
+	Timeout       time.Duration
+	ErrHandler    ErrHandlerFunc
+	ReconnectWait time.Duration
+	MaxReconnects int
 }
 
-// NewConn returns new connection value
+// NewConn returns new connection value.
+// It fails if initial connection cannot be established.
+// If connection is lost after being established, it retries automatically.
 func NewConn(config *ConnConfig) (*Conn, error) {
 	timeout := config.Timeout
 	if timeout == 0 {
 		timeout = 5 * time.Second
 	}
+	reconnectWait := config.ReconnectWait
+	if reconnectWait == 0 {
+		reconnectWait = defaultReconnectWait
+	}
+	maxReconnects := config.MaxReconnects
+	if maxReconnects == 0 {
+		maxReconnects = defaultMaxReconnect
+	}
 	conn, err := nats.Connect(
 		config.URL,
 		nats.UserInfo(config.User, config.Password),
 		nats.Timeout(timeout),
+		nats.ReconnectWait(reconnectWait),
+		nats.MaxReconnects(maxReconnects),
+		nats.DisconnectErrHandler(func(_ *nats.Conn, err error) {
+			log.Warn().Err(err).Msg("nats: connection lost, reconnecting")
+		}),
+		nats.ReconnectHandler(func(_ *nats.Conn) {
+			log.Info().Msg("nats: reconnected")
+		}),
+		nats.ClosedHandler(func(_ *nats.Conn) {
+			log.Fatal().Msg("nats: connection closed, exiting")
+		}),
 	)
 	if err != nil {
 		return nil, err
