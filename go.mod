@@ -9,7 +9,7 @@ require (
 	github.com/jarcoal/httpmock v1.4.1
 	github.com/nats-io/nats.go v1.49.0
 	github.com/rs/zerolog v1.34.0
-	golang.org/x/exp v0.0.0-20260218203240-3dfff04db8fa
+	golang.org/x/exp v0.0.0-20260312153236-7ab1446f8b90
 	gorm.io/gorm v1.31.1
 )
 
