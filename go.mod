@@ -8,7 +8,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/jarcoal/httpmock v1.4.1
 	github.com/nats-io/nats.go v1.51.0
-	github.com/rs/zerolog v1.35.0
+	github.com/rs/zerolog v1.35.1
 	golang.org/x/exp v0.0.0-20260410095643-746e56fc9e2f
 	gorm.io/gorm v1.31.1
 )
