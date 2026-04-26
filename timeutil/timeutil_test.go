@@ -10,8 +10,7 @@ import (
 )
 
 func timeFixture() time.Time {
-	t, _ := time.Parse(time.RFC3339, "2022-06-03T16:26:15Z")
-	return t
+	return time.Date(2022, 6, 3, 16, 26, 15, 0, time.UTC)
 }
 
 func TestLocalWithNoTZ(t *testing.T) {
@@ -43,4 +42,12 @@ func TestMockNowFn(t *testing.T) {
 	defer timeutil.UnmockNow()
 
 	testutil.Diff(timeFixture(), timeutil.Now(), t)
+}
+
+func TestStartOfDay(t *testing.T) {
+	testutil.Diff("2022-06-03T00:00:01Z", timeutil.StartOfDay(timeFixture()).Format(time.RFC3339), t)
+}
+
+func TestEndOfDay(t *testing.T) {
+	testutil.Diff("2022-06-03T23:59:59Z", timeutil.EndOfDay(timeFixture()).Format(time.RFC3339), t)
 }

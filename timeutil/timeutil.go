@@ -64,6 +64,18 @@ func IsDay() bool {
 	return false
 }
 
+// StartOfDay returns time with the same date as given but with time set to 00:00:01
+func StartOfDay(t time.Time) time.Time {
+	y, m, d := t.Date()
+	return time.Date(y, m, d, 0, 0, 1, 0, t.Location())
+}
+
+// EndOfDay returns time with the same date as given but with time set to 23:59:59
+func EndOfDay(t time.Time) time.Time {
+	y, m, d := t.Date()
+	return time.Date(y, m, d, 23, 59, 59, 0, t.Location())
+}
+
 // Init initializes timeutil
 func Init() error {
 	tz := os.Getenv("TZ")
