@@ -19,10 +19,11 @@ const (
 
 // Conn implements nats connection
 type Conn struct {
-	env           envutil.AppEnv
-	conn          *nats.Conn
-	subscriptions map[*nats.Subscription]struct{}
-	ErrHandler    ErrHandlerFunc
+	env            envutil.AppEnv
+	conn           *nats.Conn
+	subscriptions  map[*nats.Subscription]struct{}
+	ErrHandler     ErrHandlerFunc
+	withLatencyLog bool
 }
 
 // Env returns current app env
@@ -61,6 +62,12 @@ func (c *Conn) PublishJSON(subj string, data any) error {
 func (c *Conn) Subscribe(subj string, fn MsgHandlerFunc) error {
 	subj = c.enrichSubj(subj)
 	sub, err := c.conn.Subscribe(subj, func(msg *nats.Msg) {
+		if c.withLatencyLog {
+			defer func(start time.Time) {
+				lat := fmt.Sprintf("%dms", time.Since(start).Milliseconds())
+				log.Debug().Str("subject", msg.Subject).Str("latency", lat).RawJSON("params", msg.Data).Msg("nats request")
+			}(time.Now())
+		}
 		if err := fn(msg); err != nil {
 			c.ErrHandler(msg, err)
 		}
@@ -138,14 +145,15 @@ func (c *Conn) Close() error {
 
 // ConnConfig defines connection configuration
 type ConnConfig struct {
-	Env           envutil.AppEnv
-	URL           string
-	User          string
-	Password      string
-	Timeout       time.Duration
-	ErrHandler    ErrHandlerFunc
-	ReconnectWait time.Duration
-	MaxReconnects int
+	Env            envutil.AppEnv
+	URL            string
+	User           string
+	Password       string
+	Timeout        time.Duration
+	ErrHandler     ErrHandlerFunc
+	WithLatencyLog bool
+	ReconnectWait  time.Duration
+	MaxReconnects  int
 }
 
 // NewConn returns new connection value.
@@ -188,10 +196,11 @@ func NewConn(config *ConnConfig) (*Conn, error) {
 		errHandler = DefaultErrHandler
 	}
 	return &Conn{
-		env:           config.Env,
-		conn:          conn,
-		subscriptions: make(map[*nats.Subscription]struct{}),
-		ErrHandler:    errHandler,
+		env:            config.Env,
+		conn:           conn,
+		subscriptions:  make(map[*nats.Subscription]struct{}),
+		ErrHandler:     errHandler,
+		withLatencyLog: config.WithLatencyLog,
 	}, nil
 }
 
@@ -214,9 +223,10 @@ func DefaultConn() (*Conn, error) {
 		return nil, err
 	}
 	return NewConn(&ConnConfig{
-		Env:      env,
-		URL:      url,
-		User:     user,
-		Password: password,
+		Env:            env,
+		URL:            url,
+		User:           user,
+		Password:       password,
+		WithLatencyLog: true,
 	})
 }
