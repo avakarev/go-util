@@ -94,7 +94,7 @@ func (db *DB) Create(model any) error {
 }
 
 // Changeset extracts values of given field names from the model
-func Changeset(model any, names []string) (map[string]any, error) {
+func Changeset(model any, fields []string) (map[string]any, error) {
 	data := make(map[string]any)
 	source := reflect.ValueOf(model)
 	if source.Kind() != reflect.Pointer {
@@ -105,18 +105,18 @@ func Changeset(model any, names []string) (map[string]any, error) {
 		return nil, fmt.Errorf("model is expected to be <struct>, instead <%s> is given", source.Kind())
 	}
 	ns := schema.NamingStrategy{}
-	for _, n := range names {
-		f := source.FieldByName(n)
+	for _, name := range fields {
+		f := source.FieldByName(name)
 		if !f.IsValid() {
-			return nil, fmt.Errorf("model doesn't have %s field", n)
+			return nil, fmt.Errorf("model doesn't have %s field", name)
 		}
-		data[ns.ColumnName("", n)] = f.Interface()
+		data[ns.ColumnName("", name)] = f.Interface()
 	}
 	return data, nil
 }
 
 // Update validates and persists existing record
-func (db *DB) Update(model any, names ...string) error {
+func (db *DB) Update(model any, fields ...string) error {
 	if db.locksEnabled {
 		db.mu.Lock()
 		defer db.mu.Unlock()
@@ -126,20 +126,24 @@ func (db *DB) Update(model any, names ...string) error {
 		return err
 	}
 
-	if len(names) == 0 {
-		return db.Conn().Updates(model).Error
+	if len(fields) == 0 {
+		if err := db.Conn().Updates(model).Error; err != nil {
+			return err
+		} else {
+			db.AfterUpdateHook(model)
+		}
 	}
 
-	data, err := Changeset(model, names)
+	data, err := Changeset(model, fields)
 	if err != nil {
 		return err
 	}
-
 	if err := db.Conn().Model(model).Updates(data).Error; err != nil {
 		return err
+	} else {
+		db.AfterUpdateHook(model)
 	}
 
-	db.AfterUpdateHook(model)
 	return nil
 }
 
