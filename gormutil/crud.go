@@ -8,7 +8,6 @@ import (
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
-	"gorm.io/gorm/schema"
 )
 
 // First returns first row matching the given query
@@ -104,13 +103,12 @@ func Changeset(model any, fields []string) (map[string]any, error) {
 	if source.Kind() != reflect.Struct {
 		return nil, fmt.Errorf("model is expected to be <struct>, instead <%s> is given", source.Kind())
 	}
-	ns := schema.NamingStrategy{}
 	for _, name := range fields {
 		f := source.FieldByName(name)
 		if !f.IsValid() {
 			return nil, fmt.Errorf("model doesn't have %s field", name)
 		}
-		data[ns.ColumnName("", name)] = f.Interface()
+		data[namer.ColumnName("", name)] = f.Interface()
 	}
 	return data, nil
 }

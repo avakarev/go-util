@@ -2,8 +2,6 @@ package gormutil
 
 import (
 	"reflect"
-
-	"gorm.io/gorm/schema"
 )
 
 const (
@@ -110,6 +108,5 @@ func tableName(v any) string {
 	if modelType.Kind() == reflect.Pointer {
 		modelType = modelType.Elem()
 	}
-	namer := schema.NamingStrategy{}
 	return namer.TableName(modelType.Name())
 }
