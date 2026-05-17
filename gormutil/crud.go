@@ -127,9 +127,9 @@ func (db *DB) Update(model any, fields ...string) error {
 	if len(fields) == 0 {
 		if err := db.Conn().Updates(model).Error; err != nil {
 			return err
-		} else {
-			db.AfterUpdateHook(model)
 		}
+		db.AfterUpdateHook(model)
+		return nil
 	}
 
 	data, err := Changeset(model, fields)
@@ -138,10 +138,8 @@ func (db *DB) Update(model any, fields ...string) error {
 	}
 	if err := db.Conn().Model(model).Updates(data).Error; err != nil {
 		return err
-	} else {
-		db.AfterUpdateHook(model)
 	}
-
+	db.AfterUpdateHook(model)
 	return nil
 }
 
