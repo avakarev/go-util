@@ -2,6 +2,7 @@ package natsutil
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -133,13 +134,17 @@ func (c *Conn) RequestJSON(subj string, v any, timeout time.Duration, destPtr an
 
 // Close unsubscribes consumers and closes connections
 func (c *Conn) Close() error {
+	var errs []error
 	for sub := range c.subscriptions {
 		if err := sub.Unsubscribe(); err != nil {
-			return err
+			errs = append(errs, err)
 		}
-		delete(c.subscriptions, sub)
 	}
+	c.subscriptions = nil
 	c.conn.Close()
+	if len(errs) > 0 {
+		return errors.Join(errs...)
+	}
 	return nil
 }
 
