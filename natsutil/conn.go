@@ -2,6 +2,7 @@ package natsutil
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -32,9 +33,9 @@ func (c *Conn) Env() envutil.AppEnv {
 }
 
 func (c *Conn) enrichSubj(subj string) string {
-	if strings.HasPrefix(subj, envutil.EnvDev) ||
-		strings.HasPrefix(subj, envutil.EnvBeta) ||
-		strings.HasPrefix(subj, envutil.EnvProd) {
+	if strings.HasPrefix(subj, envutil.EnvDev+".") ||
+		strings.HasPrefix(subj, envutil.EnvBeta+".") ||
+		strings.HasPrefix(subj, envutil.EnvProd+".") {
 		return subj
 	}
 	return fmt.Sprintf("%s.%s", c.env.String(), subj)
@@ -133,13 +134,17 @@ func (c *Conn) RequestJSON(subj string, v any, timeout time.Duration, destPtr an
 
 // Close unsubscribes consumers and closes connections
 func (c *Conn) Close() error {
+	var errs []error
 	for sub := range c.subscriptions {
 		if err := sub.Unsubscribe(); err != nil {
-			return err
+			errs = append(errs, err)
 		}
-		delete(c.subscriptions, sub)
 	}
+	c.subscriptions = nil
 	c.conn.Close()
+	if len(errs) > 0 {
+		return errors.Join(errs...)
+	}
 	return nil
 }
 
@@ -185,11 +190,14 @@ func NewConn(config *ConnConfig) (*Conn, error) {
 			log.Info().Msg("nats: reconnected")
 		}),
 		nats.ClosedHandler(func(_ *nats.Conn) {
-			log.Fatal().Msg("nats: connection closed, exiting")
+			log.Error().Msg("nats: connection closed, giving up")
 		}),
 	)
 	if err != nil {
 		return nil, err
+	}
+	if conn == nil {
+		return nil, errors.New("nats: no connection established")
 	}
 	errHandler := config.ErrHandler
 	if errHandler == nil {

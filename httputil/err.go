@@ -33,14 +33,14 @@ type ErrResponse struct {
 
 // WriteJSON responds json error with http.ResponseWriter
 func (e *ErrResponse) WriteJSON(w http.ResponseWriter) {
-	w.WriteHeader(e.Error.Code)
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(e.Error.Code)
 	bytes, err := json.Marshal(e)
 	if err != nil {
 		log.Error().Err(err).Send()
 		return
 	}
-	if _, err := w.Write([]byte(bytes)); err != nil {
+	if _, err := w.Write(bytes); err != nil {
 		log.Error().Err(err).Send()
 	}
 }

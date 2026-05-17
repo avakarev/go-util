@@ -8,7 +8,10 @@ import (
 	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"gorm.io/gorm/schema"
 )
+
+var namer schema.Namer = new(schema.NamingStrategy)
 
 // DB defines db container
 type DB struct {

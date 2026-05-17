@@ -8,7 +8,6 @@ import (
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
-	"gorm.io/gorm/schema"
 )
 
 // First returns first row matching the given query
@@ -43,9 +42,9 @@ func (db *DB) Count(model any) int64 {
 }
 
 // CountBy returns number of record in given table with given conditions
-func (db *DB) CountBy(model any, cond any, args ...any) int64 {
+func (db *DB) CountBy(model any, whereQuery any, whereArgs ...any) int64 {
 	var count int64
-	db.Conn().Model(model).Where(cond, args).Count(&count)
+	db.Conn().Model(model).Where(whereQuery, whereArgs...).Count(&count)
 	return count
 }
 
@@ -53,11 +52,12 @@ func (db *DB) CountBy(model any, cond any, args ...any) int64 {
 //
 // @TODO: try to optimize the query to something like
 // SELECT EXISTS(SELECT 1 FROM vaults WHERE id="foobar" LIMIT 1);
-func (db *DB) ExistsBy(model any, cond any, args ...any) bool {
+func (db *DB) ExistsBy(model any, whereQuery any, whereArgs ...any) bool {
 	var exists bool
 	q := db.Conn().
-		Model(model).Select("count(*) > 0").
-		Where(cond, args)
+		Model(model).
+		Select("count(*) > 0").
+		Where(whereQuery, whereArgs...)
 	if err := q.Find(&exists).Error; err != nil && db.config.Logger != nil {
 		db.config.Logger.Error(context.Background(), "failed to query database, got error %v", err)
 	}
@@ -93,7 +93,7 @@ func (db *DB) Create(model any) error {
 }
 
 // Changeset extracts values of given field names from the model
-func Changeset(model any, names []string) (map[string]any, error) {
+func Changeset(model any, fields []string) (map[string]any, error) {
 	data := make(map[string]any)
 	source := reflect.ValueOf(model)
 	if source.Kind() != reflect.Pointer {
@@ -103,19 +103,18 @@ func Changeset(model any, names []string) (map[string]any, error) {
 	if source.Kind() != reflect.Struct {
 		return nil, fmt.Errorf("model is expected to be <struct>, instead <%s> is given", source.Kind())
 	}
-	ns := schema.NamingStrategy{}
-	for _, n := range names {
-		f := source.FieldByName(n)
+	for _, name := range fields {
+		f := source.FieldByName(name)
 		if !f.IsValid() {
-			return nil, fmt.Errorf("model doesn't have %s field", n)
+			return nil, fmt.Errorf("model doesn't have %s field", name)
 		}
-		data[ns.ColumnName("", n)] = f.Interface()
+		data[namer.ColumnName("", name)] = f.Interface()
 	}
 	return data, nil
 }
 
 // Update validates and persists existing record
-func (db *DB) Update(model any, names ...string) error {
+func (db *DB) Update(model any, fields ...string) error {
 	if db.locksEnabled {
 		db.mu.Lock()
 		defer db.mu.Unlock()
@@ -125,19 +124,21 @@ func (db *DB) Update(model any, names ...string) error {
 		return err
 	}
 
-	if len(names) == 0 {
-		return db.Conn().Updates(model).Error
+	if len(fields) == 0 {
+		if err := db.Conn().Updates(model).Error; err != nil {
+			return err
+		}
+		db.AfterUpdateHook(model)
+		return nil
 	}
 
-	data, err := Changeset(model, names)
+	data, err := Changeset(model, fields)
 	if err != nil {
 		return err
 	}
-
 	if err := db.Conn().Model(model).Updates(data).Error; err != nil {
 		return err
 	}
-
 	db.AfterUpdateHook(model)
 	return nil
 }
