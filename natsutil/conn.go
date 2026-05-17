@@ -190,11 +190,14 @@ func NewConn(config *ConnConfig) (*Conn, error) {
 			log.Info().Msg("nats: reconnected")
 		}),
 		nats.ClosedHandler(func(_ *nats.Conn) {
-			log.Fatal().Msg("nats: connection closed, exiting")
+			log.Error().Msg("nats: connection closed, giving up")
 		}),
 	)
 	if err != nil {
 		return nil, err
+	}
+	if conn == nil {
+		return nil, errors.New("nats: no connection established")
 	}
 	errHandler := config.ErrHandler
 	if errHandler == nil {
