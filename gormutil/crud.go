@@ -43,9 +43,9 @@ func (db *DB) Count(model any) int64 {
 }
 
 // CountBy returns number of record in given table with given conditions
-func (db *DB) CountBy(model any, cond any, args ...any) int64 {
+func (db *DB) CountBy(model any, whereQuery any, whereArgs ...any) int64 {
 	var count int64
-	db.Conn().Model(model).Where(cond, args).Count(&count)
+	db.Conn().Model(model).Where(whereQuery, whereArgs...).Count(&count)
 	return count
 }
 
@@ -53,11 +53,12 @@ func (db *DB) CountBy(model any, cond any, args ...any) int64 {
 //
 // @TODO: try to optimize the query to something like
 // SELECT EXISTS(SELECT 1 FROM vaults WHERE id="foobar" LIMIT 1);
-func (db *DB) ExistsBy(model any, cond any, args ...any) bool {
+func (db *DB) ExistsBy(model any, whereQuery any, whereArgs ...any) bool {
 	var exists bool
 	q := db.Conn().
-		Model(model).Select("count(*) > 0").
-		Where(cond, args)
+		Model(model).
+		Select("count(*) > 0").
+		Where(whereQuery, whereArgs...)
 	if err := q.Find(&exists).Error; err != nil && db.config.Logger != nil {
 		db.config.Logger.Error(context.Background(), "failed to query database, got error %v", err)
 	}
