@@ -8,9 +8,9 @@ import (
 
 // ModelBase contains common columns for all tables
 type ModelBase struct {
-	ID        uuid.UUID `gorm:"type:uuid;primaryKey;uniqueIndex" json:"id" validate:"required"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	ID        uuid.UUID `json:"id" yaml:"id" validate:"required" gorm:"type:uuid;primaryKey;uniqueIndex"`
+	CreatedAt time.Time `json:"createdAt" yaml:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt" yaml:"updatedAt"`
 }
 
 // GenerateID generates and assigns new id value
