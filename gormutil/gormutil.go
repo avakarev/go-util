@@ -2,6 +2,8 @@
 package gormutil
 
 import (
+	"reflect"
+	"strings"
 	"sync"
 	"time"
 
@@ -12,6 +14,20 @@ import (
 )
 
 var namer schema.Namer = new(schema.NamingStrategy)
+
+// TagNameFunc returns a validator.TagNameFunc that derives the reported field name
+// from the given struct tag key (e.g. "json", "yaml"). This makes validation errors
+// reference the tag field name instead of the Go struct field name. A tag value of "-"
+// yields an empty name so validator falls back to its default behavior for that field.
+func TagNameFunc(tag string) validator.TagNameFunc {
+	return func(field reflect.StructField) string {
+		name, _, _ := strings.Cut(field.Tag.Get(tag), ",")
+		if name == "-" {
+			return ""
+		}
+		return name
+	}
+}
 
 // DB defines db container
 type DB struct {
@@ -125,6 +141,7 @@ func WithNowFunc(fn func() time.Time) ConfigureFunc {
 // Open initializes db session based on dialector
 func Open(dialector gorm.Dialector, fns ...ConfigureFunc) (*DB, error) {
 	db := &DB{config: &gorm.Config{}, validate: validator.New()}
+	db.validate.RegisterTagNameFunc(TagNameFunc("json"))
 	for _, fn := range fns {
 		if err := fn(db); err != nil {
 			return nil, err

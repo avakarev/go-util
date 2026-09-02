@@ -15,7 +15,10 @@ import (
 
 // ValidationErr represents validation error
 type ValidationErr struct {
+	// Deprecated: use Field instead. Subject is kept for backwards
+	// compatibility and will be removed in a future release.
 	Subject string `json:"subject"`
+	Field   string `json:"field"`
 	Msg     string `json:"msg"`
 }
 
@@ -119,8 +122,14 @@ func NewValidationErr(errors validator.ValidationErrors) *ErrResponse {
 	err.Error.Items = make([]ValidationErr, len(errors))
 	for i, e := range errors {
 		err.Error.Items[i] = ValidationErr{
+			// Subject is a legacy field and in most situations decapitalized
+			// field name mismatches serialized struct's field name
 			Subject: strutil.Decapitalize(e.Field()),
-			Msg:     ValidationErrMsg(e),
+			// Field returns either struct's field as-it or extracts tagged name e.g. `json`,
+			// in case when tag-name func is registered within validator instance
+			Field: e.Field(),
+			// Msg is a human-readable error message based on field's validation types
+			Msg: ValidationErrMsg(e),
 		}
 	}
 	return err
@@ -128,8 +137,7 @@ func NewValidationErr(errors validator.ValidationErrors) *ErrResponse {
 
 // NewErrFrom returns new error value from given error
 func NewErrFrom(err error) *ErrResponse {
-	var ve validator.ValidationErrors
-	if errors.As(err, &ve) {
+	if ve, ok := errors.AsType[validator.ValidationErrors](err); ok {
 		return NewValidationErr(ve)
 	}
 
