@@ -2,8 +2,6 @@ package httputil_test
 
 import (
 	"errors"
-	"reflect"
-	"strings"
 	"testing"
 
 	"github.com/go-playground/validator/v10"
@@ -20,13 +18,6 @@ func TestNewValidationErr(t *testing.T) {
 	}
 
 	validate := validator.New()
-	validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
-		name := strings.SplitN(fld.Tag.Get("json"), ",", 2)[0]
-		if name == "-" {
-			return ""
-		}
-		return name
-	})
 
 	var ve validator.ValidationErrors
 	testutil.Diff(true, errors.As(validate.Struct(&model{}), &ve), t)
@@ -37,9 +28,9 @@ func TestNewValidationErr(t *testing.T) {
 			Code: 400,
 			Msg:  "validation error",
 			Items: []httputil.ValidationErr{
-				{Subject: "name", Msg: "required but missing"},
-				{Subject: "ipv4", Msg: "required but missing"},
-				{Subject: "some", Msg: "required but missing"},
+				{Subject: "name", Field: "Name", Msg: "required but missing"},
+				{Subject: "iPV4", Field: "IPV4", Msg: "required but missing"},
+				{Subject: "some", Field: "Some", Msg: "required but missing"},
 			},
 		},
 	}, resp, t)
