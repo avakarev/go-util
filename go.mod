@@ -1,16 +1,16 @@
 module github.com/avakarev/go-util
 
-go 1.25.0
+go 1.26.0
 
 require (
 	github.com/go-playground/validator/v10 v10.30.3
 	github.com/google/go-cmp v0.7.0
 	github.com/google/uuid v1.6.0
-	github.com/jarcoal/httpmock v1.4.1
-	github.com/nats-io/nats.go v1.52.0
+	github.com/jarcoal/httpmock v1.4.2
+	github.com/nats-io/nats.go v1.53.1
 	github.com/rs/zerolog v1.35.1
-	golang.org/x/exp v0.0.0-20260611194520-c48552f49976
-	gorm.io/gorm v1.31.1
+	golang.org/x/exp v0.0.0-20260824195058-e88cd73687aa
+	gorm.io/gorm v1.31.2
 )
 
 require (
