@@ -6,37 +6,46 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // Str returns environment variable as string
-func Str(name string) string {
-	return os.Getenv(name)
+func Str(key string) string {
+	return os.Getenv(key)
 }
 
-// ShouldStr returns environment variable and error if it's not set
-func ShouldStr(name string) (string, error) {
-	value, ok := os.LookupEnv(name)
+// StrDef returns environment variable as string, or def if the variable is unset or empty
+func StrDef(key string, def string) string {
+	if v, ok := os.LookupEnv(key); ok && v != "" {
+		return v
+	}
+	return def
+}
+
+// ShouldStr returns env variable and error if it's not set
+func ShouldStr(key string) (string, error) {
+	value, ok := os.LookupEnv(key)
 	if !ok {
-		return "", fmt.Errorf("environment variable %q is required, but not set", name)
+		return "", fmt.Errorf("env variable %q is required, but not set", key)
 	}
 	if value == "" {
-		return "", fmt.Errorf("environment variable %q is required, but empty", name)
+		return "", fmt.Errorf("env variable %q is required, but empty", key)
 	}
 	return value, nil
 }
 
 // MustStr is like ShouldStr but panics in case of error
-func MustStr(name string) string {
-	value, err := ShouldStr(name)
+func MustStr(key string) string {
+	value, err := ShouldStr(key)
 	if err != nil {
 		panic(err)
 	}
 	return value
 }
 
-// ShouldStrSlice returns environment variable split by given separator and error if it's not set
-func ShouldStrSlice(name string, sep string) ([]string, error) {
-	str, err := ShouldStr(name)
+// ShouldStrSlice returns env variable split by given separator and error if it's not set
+func ShouldStrSlice(key string, sep string) ([]string, error) {
+	str, err := ShouldStr(key)
 	if err != nil {
 		return nil, err
 	}
@@ -44,17 +53,18 @@ func ShouldStrSlice(name string, sep string) ([]string, error) {
 }
 
 // MustStrSlice is like ShouldStrSlice but panics in case of error
-func MustStrSlice(name string, sep string) []string {
-	value, err := ShouldStrSlice(name, sep)
+func MustStrSlice(key string, sep string) []string {
+	value, err := ShouldStrSlice(key, sep)
 	if err != nil {
 		panic(err)
 	}
 	return value
 }
 
-// ShouldInt returns environment variable as int64 and conversion error if any
-func ShouldInt(name string) (int64, error) {
-	str := Str(name)
+// ShouldInt returns env variable parsed as int64, or a conversion error if any.
+// An unset or empty variable yields 0 without error.
+func ShouldInt(key string) (int64, error) {
+	str := Str(key)
 	if str == "" {
 		return 0, nil
 	}
@@ -62,10 +72,24 @@ func ShouldInt(name string) (int64, error) {
 }
 
 // MustInt is like ShouldInt but panics in case of error
-func MustInt(name string) int64 {
-	i, err := ShouldInt(name)
+func MustInt(key string) int64 {
+	i, err := ShouldInt(key)
 	if err != nil {
 		panic(err)
 	}
 	return i
+}
+
+// DurDef returns environment variable parsed as time.Duration, or def if the
+// variable is unset or empty. It returns an error if the value cannot be parsed.
+func DurDef(key string, def time.Duration) (time.Duration, error) {
+	v, ok := os.LookupEnv(key)
+	if !ok || v == "" {
+		return def, nil
+	}
+	d, err := time.ParseDuration(v)
+	if err != nil {
+		return 0, fmt.Errorf("env variable %q is invalid duration: %w", key, err)
+	}
+	return d, nil
 }
