@@ -31,7 +31,7 @@ func TestAppEnvIs(t *testing.T) {
 
 func TestNewAppEnv(t *testing.T) {
 	_, err := envutil.NewAppEnv()
-	testutil.MustErr(errors.New("env variable \"APP_ENV\" is required, but not set"), err, t)
+	testutil.MustErr(errors.New("envutil: env variable \"APP_ENV\" is required, but not set"), err, t)
 
 	resetEnv := testutil.SetEnv(testutil.Env{"APP_ENV": "staging"})
 	_, err = envutil.NewAppEnv()
