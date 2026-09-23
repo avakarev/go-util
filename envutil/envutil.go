@@ -26,10 +26,10 @@ func StrDef(key string, def string) string {
 func ShouldStr(key string) (string, error) {
 	value, ok := os.LookupEnv(key)
 	if !ok {
-		return "", fmt.Errorf("env variable %q is required, but not set", key)
+		return "", fmt.Errorf("envutil: env variable %q is required, but not set", key)
 	}
 	if value == "" {
-		return "", fmt.Errorf("env variable %q is required, but empty", key)
+		return "", fmt.Errorf("envutil: env variable %q is required, but empty", key)
 	}
 	return value, nil
 }
@@ -80,6 +80,22 @@ func MustInt(key string) int64 {
 	return i
 }
 
+// BoolDef returns environment variable parsed as bool, or def if the variable
+// is unset or empty. It returns an error if the value cannot be parsed.
+// Parsing is done via strconv.ParseBool, which accepts
+// 1/t/T/TRUE/true/True and 0/f/F/FALSE/false/False.
+func BoolDef(key string, def bool) (bool, error) {
+	v := Str(key)
+	if v == "" {
+		return def, nil
+	}
+	b, err := strconv.ParseBool(v)
+	if err != nil {
+		return false, fmt.Errorf("envutil: env variable %s=%q is invalid bool: %w", key, v, err)
+	}
+	return b, nil
+}
+
 // DurDef returns environment variable parsed as time.Duration, or def if the
 // variable is unset or empty. It returns an error if the value cannot be parsed.
 func DurDef(key string, def time.Duration) (time.Duration, error) {
@@ -89,7 +105,7 @@ func DurDef(key string, def time.Duration) (time.Duration, error) {
 	}
 	d, err := time.ParseDuration(v)
 	if err != nil {
-		return 0, fmt.Errorf("env variable %q is invalid duration: %w", key, err)
+		return 0, fmt.Errorf("envutil: env variable %s=%q is invalid duration: %w", key, v, err)
 	}
 	return d, nil
 }
