@@ -21,13 +21,10 @@ func TestConfigure(t *testing.T) {
 
 	// each supported level configures without error
 	for _, level := range []string{
-		slogutil.LevelTrace,
 		slogutil.LevelDebug,
 		slogutil.LevelInfo,
 		slogutil.LevelWarn,
 		slogutil.LevelError,
-		slogutil.LevelFatal,
-		slogutil.LevelPanic,
 	} {
 		resetEnv := testutil.SetEnv(testutil.Env{"LOG_LEVEL": level})
 		testutil.MustNoErr(slogutil.Configure(), t)
@@ -50,7 +47,7 @@ func TestConfigure(t *testing.T) {
 	resetEnv = testutil.SetEnv(testutil.Env{"LOG_LEVEL": "nope"})
 	defer resetEnv()
 	testutil.MustErr(
-		errors.New("slogutil: invalid LOG_LEVEL \"nope\", want one of: trace, debug, info, warn, error, fatal, panic"),
+		errors.New("slogutil: invalid LOG_LEVEL \"nope\", want one of: debug, info, warn, error"),
 		slogutil.Configure(),
 		t,
 	)
@@ -69,7 +66,7 @@ func TestConfigureWithLevel(t *testing.T) {
 
 	// invalid WithLevel value yields an error
 	testutil.MustErr(
-		errors.New("slogutil: invalid LOG_LEVEL \"nope\", want one of: trace, debug, info, warn, error, fatal, panic"),
+		errors.New("slogutil: invalid LOG_LEVEL \"nope\", want one of: debug, info, warn, error"),
 		slogutil.Configure(slogutil.WithLevel("nope")),
 		t,
 	)

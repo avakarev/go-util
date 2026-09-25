@@ -9,8 +9,6 @@ import (
 )
 
 const (
-	// LevelTrace is the "trace" log level
-	LevelTrace = "trace"
 	// LevelDebug is the "debug" log level
 	LevelDebug = "debug"
 	// LevelInfo is the "info" log level
@@ -19,10 +17,6 @@ const (
 	LevelWarn = "warn"
 	// LevelError is the "error" log level
 	LevelError = "error"
-	// LevelFatal is the "fatal" log level
-	LevelFatal = "fatal"
-	// LevelPanic is the "panic" log level
-	LevelPanic = "panic"
 )
 
 type config struct {
@@ -101,8 +95,6 @@ func (cfg *config) validate() error {
 // unsupported names return an error
 func (cfg *config) parseLevel() (log.Level, error) {
 	switch cfg.level {
-	case LevelTrace:
-		return log.TraceLevel, nil
 	case LevelDebug:
 		return log.DebugLevel, nil
 	case LevelInfo:
@@ -111,11 +103,7 @@ func (cfg *config) parseLevel() (log.Level, error) {
 		return log.WarnLevel, nil
 	case LevelError:
 		return log.ErrorLevel, nil
-	case LevelFatal:
-		return log.FatalLevel, nil
-	case LevelPanic:
-		return log.PanicLevel, nil
 	default:
-		return 0, fmt.Errorf("slogutil: invalid LOG_LEVEL %q, want one of: trace, debug, info, warn, error, fatal, panic", cfg.level)
+		return 0, fmt.Errorf("slogutil: invalid LOG_LEVEL %q, want one of: debug, info, warn, error", cfg.level)
 	}
 }
