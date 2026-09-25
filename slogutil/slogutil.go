@@ -13,7 +13,7 @@ import (
 type Option func(*config)
 
 // WithLevel sets the log level, overriding the `LOG_LEVEL` env var
-// name may be one of: trace, debug, info, warn, error, fatal, panic
+// name may be one of: debug, info, warn, error
 func WithLevel(name string) Option {
 	return func(c *config) {
 		c.level = name
