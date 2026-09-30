@@ -61,6 +61,19 @@ func MustStrSlice(key string, sep string) []string {
 	return value
 }
 
+// IntDef reads an integer env var, returning def when the key is unset or empty
+func IntDef(key string, def int) (int, error) {
+	str := os.Getenv(key)
+	if str == "" {
+		return def, nil
+	}
+	i, err := strconv.Atoi(str)
+	if err != nil {
+		return 0, fmt.Errorf("config: %s: %w", key, err)
+	}
+	return i, nil
+}
+
 // ShouldInt returns env variable parsed as int64, or a conversion error if any.
 // An unset or empty variable yields 0 without error.
 func ShouldInt(key string) (int64, error) {
