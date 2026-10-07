@@ -29,6 +29,21 @@ type Err struct {
 	Items []ValidationErr `json:"items,omitempty"`
 }
 
+// Error returns the error message for standard error interface compatibility
+func (e *Err) Error() string {
+	if e.Msg != "" {
+		return e.Msg
+	}
+	return StdErrMsg(e.Code)
+}
+
+// Errf returns a new error value with formatted message, compatible with fmt.Errorf signature
+func Errf(format string, args ...any) *Err {
+	return &Err{
+		Msg: fmt.Sprintf(format, args...),
+	}
+}
+
 // ErrResponse represents json container for error object
 type ErrResponse struct {
 	Error Err `json:"error"`

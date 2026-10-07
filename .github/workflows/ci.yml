@@ -3,6 +3,11 @@ name: ci
 on: [push]
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: golangci/golangci-lint-action@v9
   test:
     name: using go ${{ matrix.go }}
     runs-on: ubuntu-latest
@@ -14,6 +19,4 @@ jobs:
       - uses: actions/setup-go@v7
         with:
           go-version: ${{ matrix.go }}
-
-      - name: Lint & Test
-        run: make setup-ci ci
+      - run: make test
