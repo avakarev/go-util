@@ -34,7 +34,7 @@ func FixtureBytes(t *testing.T, name string, args ...string) []byte {
 	path := FixturePath(name, args...)
 	bytes, err := os.ReadFile(path) // #nosec
 	if err != nil {
-		t.Errorf("Failed to read %q fixture: %s", name, err.Error())
+		t.Errorf("failed to read %q fixture: %v", name, err)
 	}
 	return bytes
 }
