@@ -9,7 +9,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: golangci/golangci-lint-action@v9
   test:
-    name: using go ${{ matrix.go }}
+    name: test using go ${{ matrix.go }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
