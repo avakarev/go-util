@@ -24,7 +24,7 @@ type Base interface {
 // Default contains common columns for all tables: a uuid primary key plus
 // created_at / updated_at timestamps.
 type Default struct {
-	ID        uuid.UUID `json:"id" yaml:"id" validate:"required" gorm:"type:uuid;primaryKey;uniqueIndex"`
+	ID        uuid.UUID `json:"id" yaml:"id" validate:"required" gorm:"type:uuid;primaryKey"`
 	CreatedAt time.Time `json:"createdAt" yaml:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt" yaml:"updatedAt"`
 }
@@ -47,7 +47,7 @@ func (m *Default) EnsureID() error {
 // plus an indexed created_at timestamp. Unlike Default it has no updated_at
 // column, since time series rows are append-only.
 type Timeseries struct {
-	ID        uuid.UUID `json:"id" yaml:"id" validate:"required" gorm:"type:uuid;primaryKey;uniqueIndex"`
+	ID        uuid.UUID `json:"id" yaml:"id" validate:"required" gorm:"type:uuid;primaryKey"`
 	CreatedAt time.Time `json:"createdAt" yaml:"createdAt" gorm:"index"`
 }
 
