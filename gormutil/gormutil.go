@@ -68,6 +68,24 @@ func (db *DB) Commit() error {
 	return db.conn.Commit().Error
 }
 
+// Ping checks the database connection by executing a ping command.
+func (db *DB) Ping() error {
+	sqldb, err := db.Conn().DB()
+	if err != nil {
+		return err
+	}
+	return sqldb.Ping()
+}
+
+// Close closes the database connection and releases resources.
+func (db *DB) Close() error {
+	sqldb, err := db.Conn().DB()
+	if err != nil {
+		return err
+	}
+	return sqldb.Close()
+}
+
 // RegisterValidation adds a custom validation for the given tag
 func (db *DB) RegisterValidation(tag string, fn validator.Func) error {
 	return db.validate.RegisterValidation(tag, fn)

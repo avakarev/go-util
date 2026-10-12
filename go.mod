@@ -8,9 +8,9 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/jarcoal/httpmock v1.4.2
 	github.com/nats-io/nats.go v1.54.0
-	github.com/phuslu/log v1.0.136
+	github.com/phuslu/log v1.0.138
 	github.com/rs/zerolog v1.35.1
-	golang.org/x/exp v0.0.0-20260908205506-85c1c2202aba
+	golang.org/x/exp v0.0.0-20261011100332-faecfb24eb49
 	gorm.io/gorm v1.31.2
 )
 
