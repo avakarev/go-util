@@ -8,6 +8,8 @@ import (
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+
+	basemodel "github.com/avakarev/go-util/gormutil/model"
 )
 
 // First returns first row matching the given query
@@ -74,11 +76,19 @@ func (db *DB) Validate(model any) error {
 	return db.validate.Struct(model)
 }
 
-// Create validates and persists new record
+// Create validates and persists new record. If the model implements basemodel.Base,
+// its id is ensured before validation so that embedded base models get a
+// generated primary key automatically.
 func (db *DB) Create(model any) error {
 	if db.locksEnabled {
 		db.mu.Lock()
 		defer db.mu.Unlock()
+	}
+
+	if m, ok := model.(basemodel.Base); ok {
+		if err := m.EnsureID(); err != nil {
+			return err
+		}
 	}
 
 	if err := db.Validate(model); err != nil {
