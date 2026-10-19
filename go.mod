@@ -10,7 +10,7 @@ require (
 	github.com/nats-io/nats.go v1.54.0
 	github.com/phuslu/log v1.0.138
 	github.com/rs/zerolog v1.35.1
-	golang.org/x/exp v0.0.0-20261011100332-faecfb24eb49
+	golang.org/x/exp v0.0.0-20261014143641-f0251eb4aa3e
 	gorm.io/gorm v1.31.2
 )
 
