@@ -17,17 +17,19 @@ var rnd = struct {
 // alphabet is a combination of chars that could be a member of random string
 const alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 
-// String generates secure random string with given length
-func String(n int) (string, error) {
+// String generates a non-cryptographic random string with given length.
+// It is backed by math/rand and must not be used for secrets such as tokens
+// or passwords; use crypto/rand for those.
+func String(n int) string {
 	ret := make([]byte, n)
 	length := len(alphabet)
 	for i := range n {
 		ret[i] = alphabet[Int(length)]
 	}
-	return string(ret), nil
+	return string(ret)
 }
 
-// Int returns random number in range [0, nmax]
+// Int returns random number in range [0, nmax)
 // It will panic if input is invalid, <= 0
 func Int(nmax int) int {
 	rnd.Lock()
