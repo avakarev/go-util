@@ -8,12 +8,11 @@ import (
 )
 
 func TestString(t *testing.T) {
-	res, err := randutil.String(42)
-	testutil.MustNoErr(err, t)
+	res := randutil.String(42)
 	testutil.Diff(42, len(res), t)
 }
 
 func TestInt(t *testing.T) {
 	n := randutil.Int(42)
-	testutil.Diff(true, n >= 0 && n <= 42, t)
+	testutil.Diff(true, n >= 0 && n < 42, t)
 }

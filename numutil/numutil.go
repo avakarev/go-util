@@ -17,12 +17,17 @@ func Percent[T Number](percent T, total T) float64 {
 	return float64(percent) * float64(total) / 100
 }
 
-// PercentOf calculates what percent <part> of <total>
+// PercentOf calculates what percent <part> of <total>.
+// It returns 0 when total is 0 to avoid an Inf/NaN result.
 func PercentOf[T Number](part T, total T) float64 {
+	if total == 0 {
+		return 0
+	}
 	return 100 * float64(part) / float64(total)
 }
 
-// PercentDiff calculates percentage difference between two numbers
+// PercentDiff calculates percentage difference between two numbers.
+// It returns 0 when before is 0 to avoid an Inf/NaN result.
 func PercentDiff[T Number](before T, after T) float64 {
 	return PercentOf(after-before, before)
 }
@@ -38,7 +43,8 @@ func Round[T float32 | float64](value T, precision uint) float64 {
 	return math.Round(float64(value)*ratio) / ratio
 }
 
-// Drawdown calculates percentage of the peak value
+// Drawdown calculates percentage of the peak value.
+// It returns 0 when high is 0 to avoid an Inf/NaN result.
 func Drawdown[T Number](high T, regular T) float64 {
 	return PercentOf(high-regular, high)
 }

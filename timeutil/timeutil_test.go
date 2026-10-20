@@ -45,9 +45,9 @@ func TestMockNowFn(t *testing.T) {
 }
 
 func TestStartOfDay(t *testing.T) {
-	testutil.Diff("2022-06-03T00:00:01Z", timeutil.StartOfDay(timeFixture()).Format(time.RFC3339), t)
+	testutil.Diff("2022-06-03T00:00:00Z", timeutil.StartOfDay(timeFixture()).Format(time.RFC3339Nano), t)
 }
 
 func TestEndOfDay(t *testing.T) {
-	testutil.Diff("2022-06-03T23:59:59Z", timeutil.EndOfDay(timeFixture()).Format(time.RFC3339), t)
+	testutil.Diff("2022-06-03T23:59:59.999999999Z", timeutil.EndOfDay(timeFixture()).Format(time.RFC3339Nano), t)
 }
