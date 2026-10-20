@@ -69,7 +69,7 @@ func IntDef(key string, def int) (int, error) {
 	}
 	i, err := strconv.Atoi(str)
 	if err != nil {
-		return 0, fmt.Errorf("config: %s: %w", key, err)
+		return 0, fmt.Errorf("%s: %w", key, err)
 	}
 	return i, nil
 }
@@ -91,6 +91,18 @@ func MustInt(key string) int64 {
 		panic(err)
 	}
 	return i
+}
+
+// PortDef parses and validates given env var as port int
+func PortDef(key string, def int) (int, error) {
+	port, err := IntDef(key, def)
+	if err != nil {
+		return 0, err
+	}
+	if port < 1 || port > 65535 {
+		return 0, fmt.Errorf("%s: %d is not a valid port (1-65535)", key, port)
+	}
+	return port, nil
 }
 
 // BoolDef returns environment variable parsed as bool, or def if the variable
