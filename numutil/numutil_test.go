@@ -23,9 +23,18 @@ func TestPercentOf(t *testing.T) {
 	testutil.Diff(111.1, numutil.PercentOf(55.55, 50.0), t)
 }
 
+func TestPercentOfZeroTotal(t *testing.T) {
+	testutil.Diff(0.0, numutil.PercentOf(5, 0), t)
+	testutil.Diff(0.0, numutil.PercentOf(0, 0), t)
+}
+
 func TestPercentDiff(t *testing.T) {
 	testutil.Diff(25.0, numutil.PercentDiff(1.0, 1.25), t)
 	testutil.Diff(-20.0, numutil.PercentDiff(1.25, 1.0), t)
+}
+
+func TestPercentDiffZeroBefore(t *testing.T) {
+	testutil.Diff(0.0, numutil.PercentDiff(0, 10), t)
 }
 
 func TestChangeByPercent(t *testing.T) {
@@ -62,4 +71,8 @@ func TestDrawdown(t *testing.T) {
 	testutil.Diff(50.0, numutil.Drawdown(90, 45), t)
 	testutil.Diff(1.0, numutil.Drawdown(100, 99), t)
 	testutil.Diff(-25.0, numutil.Drawdown(20, 25), t)
+}
+
+func TestDrawdownZeroHigh(t *testing.T) {
+	testutil.Diff(0.0, numutil.Drawdown(0, 10), t)
 }
