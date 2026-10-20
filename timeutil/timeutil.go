@@ -64,16 +64,19 @@ func IsDay() bool {
 	return false
 }
 
-// StartOfDay returns time with the same date as given but with time set to 00:00:01
+// StartOfDay returns time with the same date as given but with time set to
+// the first instant of the day, 00:00:00.000000000
 func StartOfDay(t time.Time) time.Time {
 	y, m, d := t.Date()
-	return time.Date(y, m, d, 0, 0, 1, 0, t.Location())
+	return time.Date(y, m, d, 0, 0, 0, 0, t.Location())
 }
 
-// EndOfDay returns time with the same date as given but with time set to 23:59:59
+// EndOfDay returns time with the same date as given but with time set to the
+// last instant of the day, 23:59:59.999999999. Paired with StartOfDay this
+// makes an inclusive [StartOfDay, EndOfDay] range cover the whole day.
 func EndOfDay(t time.Time) time.Time {
 	y, m, d := t.Date()
-	return time.Date(y, m, d, 23, 59, 59, 0, t.Location())
+	return time.Date(y, m, d, 23, 59, 59, int(time.Second-time.Nanosecond), t.Location())
 }
 
 // Init initializes timeutil
